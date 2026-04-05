@@ -557,28 +557,47 @@
     ];
 
     // --- Category definitions ---
+    // --- Category definitions ---
+    // chicken = 以雞為主打嘅餐廳（原隻雞、鹽水雞、白切雞、燒雞等），唔係有雞字就算
+    // protein = 明確針對健身人群嘅餐廳（meal prep、健身餐等）
+    // healthy = 健康輕食、有機、素食等
+    // salad = 沙律、poke bowl 等
     const CATEGORIES = {
       chicken: {
-        label: '雞肉', cls: 'chicken',
+        label: '雞肉主打', cls: 'chicken',
         cuisines: ['chicken', 'rotisserie'],
-        namePatterns: ['雞', '鷄', 'chicken', 'chick'],
-        // Exclude fried chicken joints
-        excludePatterns: ['炸雞', 'fried chicken', 'fry', '脆雞']
+        // 只匹配以雞為主打嘅名稱，唔係隨便有個雞字
+        namePatterns: [
+          '鹽水雞', '白切雞', '燒雞', '烤雞', '海南雞', '手撕雞',
+          '雞煲', '雞鍋', '雞專', '雞店', '雞王', '原隻雞',
+          'roast chicken', 'chicken shop', 'chicken rice',
+          'hainan chicken', 'rotisserie'
+        ],
+        excludePatterns: ['炸雞', 'fried chicken', 'fry', '脆雞', '雞蛋', '雞尾']
       },
       protein: {
         label: '高蛋白', cls: 'protein',
-        cuisines: ['steak_house', 'seafood', 'sushi', 'japanese'],
-        namePatterns: ['蛋白', 'protein', '健身', 'fitness', 'meal prep', '增肌', 'gym', '牛扒', 'steak', '刺身', 'sashimi']
+        cuisines: [],
+        // 只匹配明確針對健身人群嘅餐廳
+        namePatterns: [
+          '蛋白', 'protein', '健身', 'fitness', 'meal prep',
+          '增肌', 'gym', 'gains', 'macro', '減脂餐',
+          'muscle', 'fitfood', 'clean food'
+        ]
       },
       healthy: {
         label: '健康', cls: 'healthy',
-        cuisines: ['health_food', 'vegetarian', 'vegan', 'organic', 'bowl', 'juice'],
-        namePatterns: ['健康', 'healthy', '輕食', 'clean', '低卡', 'diet', 'fit', '養生', 'organic', '有機', 'whole', 'green']
+        cuisines: ['health_food', 'vegetarian', 'vegan', 'organic', 'juice'],
+        namePatterns: [
+          '健康', 'healthy', '輕食', '低卡', '養生',
+          'organic', '有機', 'whole food', 'green', 'clean eat',
+          '素食', '齋', 'vegan', 'plant based'
+        ]
       },
       salad: {
         label: '沙律', cls: 'salad',
         cuisines: ['salad', 'poke'],
-        namePatterns: ['沙律', 'salad', 'poke', 'açaí', 'acai']
+        namePatterns: ['沙律', 'salad bar', 'poke bowl', 'poke', 'açaí', 'acai bowl']
       }
     };
 
@@ -586,26 +605,27 @@
     function generateDescription(place) {
       const cats = [...place.categories];
       const parts = [];
+      const nameLower = place.name.toLowerCase();
 
       if (cats.includes('chicken')) {
-        parts.push('主打雞肉料理，雞胸肉每100g含約31g蛋白質、僅3.6g脂肪，係健身人士首選嘅優質蛋白來源。');
-      }
-      if (cats.includes('protein')) {
-        if (place.cuisine.includes('sushi') || place.cuisine.includes('japanese') || place.name.includes('刺身') || place.name.includes('壽司')) {
-          parts.push('日式料理富含優質蛋白，三文魚刺身每100g含約20g蛋白質，配合低卡嘅飯量控制，適合增肌期食用。');
-        } else if (place.cuisine.includes('steak') || place.name.includes('牛扒') || place.name.includes('steak')) {
-          parts.push('牛扒含豐富蛋白質同鐵質，每100g約含26g蛋白質，增肌期間補充肌酸同鋅嘅好選擇。');
-        } else if (place.cuisine.includes('seafood')) {
-          parts.push('海鮮富含優質蛋白同Omega-3脂肪酸，低脂高蛋白，適合健身人士控制熱量同時攝取足夠營養。');
+        if (nameLower.includes('鹽水雞') || nameLower.includes('白切雞')) {
+          parts.push('鹽水雞 / 白切雞以原隻雞製作，保留雞肉鮮味，少油烹調。每100g雞胸約含31g蛋白質、僅3.6g脂肪，係增肌減脂嘅理想選擇。');
+        } else if (nameLower.includes('海南雞') || nameLower.includes('hainan')) {
+          parts.push('海南雞飯以原隻雞為主打，雞肉蛋白質豐富。建議走皮、少飯，可以大幅降低脂肪同碳水攝取。');
+        } else if (nameLower.includes('燒雞') || nameLower.includes('烤雞') || nameLower.includes('rotisserie') || nameLower.includes('roast')) {
+          parts.push('原隻燒雞 / 烤雞，蛋白質豐富。建議走皮食用，每100g雞胸約含31g蛋白質，係健身人士嘅優質蛋白來源。');
         } else {
-          parts.push('提供高蛋白餐食選擇，適合健身人士補充每日所需蛋白質攝取量。');
+          parts.push('以雞肉為主打，雞肉係健身人士首選嘅蛋白質來源之一，低脂高蛋白，適合增肌減脂期間食用。');
         }
       }
+      if (cats.includes('protein')) {
+        parts.push('明確針對健身人群，提供高蛋白、可控制營養成分嘅餐食，方便追蹤每日蛋白質同熱量攝取。');
+      }
       if (cats.includes('healthy')) {
-        parts.push('主打健康飲食，注重營養均衡、低油低鹽，適合減脂期控制熱量攝取。');
+        parts.push('主打健康飲食，注重營養均衡、低油低鹽，食材新鮮天然，適合減脂期控制熱量攝取。');
       }
       if (cats.includes('salad')) {
-        parts.push('新鮮沙律高纖低卡，配合蛋白質配料（如雞肉、蛋、豆腐），係減脂期間理想嘅輕食選擇。');
+        parts.push('提供新鮮沙律，高纖低卡。建議揀含雞肉、蛋或豆腐等蛋白質配料，兼顧飽肚感同營養攝取。');
       }
 
       return parts.join(' ') || '提供適合健身人士嘅餐食選擇。';
@@ -752,10 +772,8 @@
         [out:json][timeout:30];
         (
           node["amenity"="restaurant"](around:${radius},${lat},${lng});
-          node["amenity"="fast_food"](around:${radius},${lat},${lng});
           node["amenity"="cafe"]["cuisine"](around:${radius},${lat},${lng});
           way["amenity"="restaurant"](around:${radius},${lat},${lng});
-          way["amenity"="fast_food"](around:${radius},${lat},${lng});
         );
         out center tags;
       `;
@@ -888,6 +906,14 @@
       return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
     }
 
+    // Google Maps URL: 用餐廳全名 + 地址，等 Google Maps 搵到間鋪
+    function getMapsUrl(place) {
+      const destination = place.address
+        ? `${place.name}, ${place.address}`
+        : place.name;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
+    }
+
     // --- Filter ---
     function setFilter(filter) {
       currentFilter = filter;
@@ -931,7 +957,7 @@
           popupAnchor: [0, -32]
         });
 
-        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
+        const mapsUrl = getMapsUrl(place);
 
         const shortDesc = place.description.length > 60 ? place.description.substring(0, 58) + '...' : place.description;
 
@@ -1005,7 +1031,7 @@
       const list = document.getElementById('resultsList');
       const header = document.getElementById('listHeader');
 
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
+      const mapsUrl = getMapsUrl(place);
       const osmUrl = `https://www.openstreetmap.org/node/${place.id}`;
 
       let hoursHTML = '';
