@@ -1,0 +1,13 @@
+{
+  "name": "fitfood-map",
+  "version": "1.0.0",
+  "description": "健身飲食地圖 - 搵附近高蛋白、雞肉、健康餐廳",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
