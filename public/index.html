@@ -938,6 +938,33 @@
     }
 
     // ============================================================
+    // OVERPASS FETCH WITH RETRY
+    // ============================================================
+    const OVERPASS_SERVERS = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter'
+    ];
+
+    async function fetchOverpass(query) {
+      for (const server of OVERPASS_SERVERS) {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
+            const res = await fetch(server, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: `data=${encodeURIComponent(query)}`
+            });
+            const text = await res.text();
+            if (text.startsWith('<') || text.startsWith('<?xml')) continue;
+            return JSON.parse(text);
+          } catch { continue; }
+        }
+      }
+      return { elements: [] };
+    }
+
+    // ============================================================
     // SEARCH
     // ============================================================
     async function searchNearby() {
@@ -946,25 +973,10 @@
       const radius = 2000;
       const { lat, lng } = userPos;
 
-      const query = `
-        [out:json][timeout:30];
-        (
-          node["amenity"="restaurant"](around:${radius},${lat},${lng});
-          node["amenity"="fast_food"](around:${radius},${lat},${lng});
-          node["amenity"="cafe"]["cuisine"](around:${radius},${lat},${lng});
-          way["amenity"="restaurant"](around:${radius},${lat},${lng});
-          way["amenity"="fast_food"](around:${radius},${lat},${lng});
-        );
-        out center tags;
-      `;
+      const query = `[out:json][timeout:25];(node["amenity"="restaurant"](around:${radius},${lat},${lng});node["amenity"="fast_food"](around:${radius},${lat},${lng});node["amenity"="cafe"](around:${radius},${lat},${lng});node["amenity"="food_court"](around:${radius},${lat},${lng});way["amenity"="restaurant"](around:${radius},${lat},${lng});way["amenity"="fast_food"](around:${radius},${lat},${lng}););out center tags;`;
 
       try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `data=${encodeURIComponent(query)}`
-        });
-        const data = await res.json();
+        const data = await fetchOverpass(query);
 
         if (data.elements) {
           allPlaces = data.elements
