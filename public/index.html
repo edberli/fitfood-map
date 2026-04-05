@@ -744,7 +744,7 @@
         cuisines: ['chicken', 'rotisserie'],
         // 有「雞」字就算（會由 blacklist + exclude 過濾唔適合嘅）
         namePatterns: ['雞', '鷄', 'chicken', 'chick'],
-        excludePatterns: ['炸雞', 'fried chicken', '脆雞', '雞蛋仔', '雞尾', '雞尾酒']
+        excludePatterns: ['雞蛋仔', '雞尾酒']
       },
       protein: {
         label: '高蛋白', cls: 'protein',
@@ -950,8 +950,10 @@
         [out:json][timeout:30];
         (
           node["amenity"="restaurant"](around:${radius},${lat},${lng});
+          node["amenity"="fast_food"](around:${radius},${lat},${lng});
           node["amenity"="cafe"]["cuisine"](around:${radius},${lat},${lng});
           way["amenity"="restaurant"](around:${radius},${lat},${lng});
+          way["amenity"="fast_food"](around:${radius},${lat},${lng});
         );
         out center tags;
       `;
