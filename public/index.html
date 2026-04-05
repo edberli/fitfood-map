@@ -7,167 +7,204 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍗</text></svg>">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: rgba(255,255,255,0.04);
+      --surface-hover: rgba(255,255,255,0.07);
+      --surface-active: rgba(0,212,170,0.08);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(0,212,170,0.3);
+      --accent: #00d4aa;
+      --accent-glow: rgba(0,212,170,0.15);
+      --accent2: #6c5ce7;
+      --text: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.5);
+      --text-muted: rgba(255,255,255,0.3);
+      --danger: #ff6b6b;
+      --success: #51cf66;
+      --gold: #ffd43b;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-full: 999px;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f0f0f;
-      color: #e0e0e0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       height: 100vh;
       height: 100dvh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
+    /* ==================== HEADER ==================== */
     header {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      padding: 10px 20px;
+      background: linear-gradient(180deg, rgba(15,15,25,0.98) 0%, rgba(10,10,15,0.95) 100%);
+      backdrop-filter: blur(20px);
+      padding: 14px 24px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid #00d4aa;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
       z-index: 1000;
       flex-shrink: 0;
-      gap: 12px;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       flex-shrink: 0;
     }
 
     .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #00d4aa, #00b894);
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent), #00b894);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(0,212,170,0.25);
     }
 
-    .logo h1 {
+    .logo-text h1 {
       font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(90deg, #00d4aa, #55efc4);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      line-height: 1.2;
     }
 
-    .logo .subtitle {
-      font-weight: 400;
+    .logo-text .subtitle {
       font-size: 11px;
-      background: none;
-      -webkit-text-fill-color: #888;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
-    /* Location search bar */
     .location-bar {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex: 1;
-      max-width: 400px;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 4px 4px 4px 18px;
+      transition: border-color 0.3s;
     }
+
+    .location-bar:focus-within { border-color: var(--accent); }
 
     .location-bar input {
       flex: 1;
-      padding: 8px 14px;
-      border: 2px solid #333;
-      border-radius: 10px;
-      background: #111;
-      color: #e0e0e0;
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .location-bar input:focus { border-color: #00d4aa; }
-
-    .location-bar input::placeholder { color: #666; }
-
-    .location-bar button {
-      padding: 8px 14px;
       border: none;
-      border-radius: 10px;
+      background: none;
+      color: var(--text);
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 400;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .location-bar input::placeholder { color: var(--text-muted); }
+
+    .loc-btn {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 50%;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
       transition: all 0.2s;
-      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    .btn-search {
-      background: #00d4aa;
-      color: #0f0f0f;
-    }
+    .btn-search-icon { background: var(--accent); color: var(--bg); }
+    .btn-search-icon:hover { background: #00b894; transform: scale(1.05); }
 
-    .btn-search:hover { background: #00b894; }
-
-    .btn-gps {
-      background: #333;
-      color: #ccc;
-    }
-
-    .btn-gps:hover { background: #444; }
-
-    .btn-gps.active {
-      background: #4285f4;
-      color: #fff;
-    }
+    .btn-gps-icon { background: var(--surface); color: var(--text-secondary); }
+    .btn-gps-icon:hover { background: var(--surface-hover); }
+    .btn-gps-icon.active { background: #4285f4; color: #fff; }
 
     .filters {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
+      gap: 6px;
       flex-shrink: 0;
     }
 
     .filter-btn {
       padding: 8px 16px;
-      border: 2px solid #333;
-      border-radius: 25px;
-      background: transparent;
-      color: #ccc;
-      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 12px;
       font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
       transition: all 0.25s;
       white-space: nowrap;
     }
 
-    .filter-btn:hover { border-color: #00d4aa; color: #00d4aa; }
-    .filter-btn.active { background: #00d4aa; border-color: #00d4aa; color: #0f0f0f; }
+    .filter-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--accent);
+      background: var(--accent-glow);
+    }
 
-    /* Location status bar */
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+      box-shadow: 0 2px 12px rgba(0,212,170,0.3);
+    }
+
+    /* Location bar */
     .location-status {
-      background: #16213e;
-      padding: 6px 20px;
-      font-size: 12px;
-      color: #888;
-      border-bottom: 1px solid #333;
+      background: rgba(15,15,25,0.6);
+      padding: 6px 24px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      letter-spacing: 0.2px;
     }
 
     .location-status .dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: #ff4757;
+      background: var(--danger);
+      flex-shrink: 0;
     }
 
-    .location-status .dot.located { background: #2ed573; }
+    .location-status .dot.located {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(81,207,102,0.5);
+    }
 
+    /* ==================== MAIN ==================== */
     .main-content {
       flex: 1;
       display: flex;
@@ -178,19 +215,34 @@
 
     #map { flex: 1; min-height: 0; z-index: 1; }
 
-    .leaflet-tile-pane { filter: brightness(0.7) contrast(1.1) saturate(0.8) hue-rotate(180deg) invert(1); }
-    .leaflet-control-attribution { display: none !important; }
-    .leaflet-control-zoom a {
-      background: #1a1a2e !important;
-      color: #00d4aa !important;
-      border-color: #333 !important;
+    .leaflet-tile-pane {
+      filter: brightness(0.65) contrast(1.2) saturate(0.3) hue-rotate(180deg) invert(1);
     }
 
+    .leaflet-control-attribution { display: none !important; }
+
+    .leaflet-control-zoom {
+      border: none !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+    }
+
+    .leaflet-control-zoom a {
+      background: rgba(15,15,25,0.9) !important;
+      color: var(--accent) !important;
+      border: 1px solid var(--border) !important;
+      backdrop-filter: blur(10px) !important;
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 36px !important;
+      font-size: 16px !important;
+    }
+
+    /* ==================== SIDEBAR ==================== */
     .sidebar {
       width: 420px;
-      background: #1a1a1a;
+      background: var(--bg);
       overflow: hidden;
-      border-left: 1px solid #333;
+      border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -198,74 +250,112 @@
     }
 
     .sidebar-header {
-      padding: 14px 16px;
-      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-shrink: 0;
     }
 
-    .sidebar-header h2 { font-size: 16px; color: #00d4aa; }
+    .sidebar-header h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
 
     .result-count {
-      font-size: 12px;
-      color: #888;
-      background: #2a2a2a;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-glow);
       padding: 4px 12px;
-      border-radius: 12px;
+      border-radius: var(--radius-full);
     }
 
     .results-list {
       flex: 1;
       overflow-y: auto;
-      padding: 8px;
+      padding: 12px;
     }
 
-    .results-list::-webkit-scrollbar { width: 6px; }
+    .results-list::-webkit-scrollbar { width: 4px; }
     .results-list::-webkit-scrollbar-track { background: transparent; }
-    .results-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    .results-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
+    /* ==================== CARDS ==================== */
     .restaurant-card {
-      background: #222;
-      border-radius: 12px;
-      padding: 14px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
       margin-bottom: 8px;
       cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid #333;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
     }
 
-    .restaurant-card:hover { border-color: #00d4aa; transform: translateX(-2px); }
-    .restaurant-card.selected { border-color: #00d4aa; background: #1a2a25; }
+    .restaurant-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .restaurant-card:hover {
+      border-color: var(--border-hover);
+      background: var(--surface-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .restaurant-card:hover::before { opacity: 1; }
+
+    .restaurant-card.selected {
+      border-color: var(--accent);
+      background: var(--surface-active);
+    }
+
+    .restaurant-card.selected::before { opacity: 1; }
 
     .card-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
 
     .restaurant-name {
       font-size: 15px;
-      font-weight: 600;
-      color: #fff;
+      font-weight: 700;
+      color: var(--text);
       flex: 1;
       line-height: 1.3;
+      letter-spacing: -0.3px;
     }
 
     .restaurant-desc {
       font-size: 12px;
-      color: #81ecec;
-      margin: 6px 0 8px;
-      line-height: 1.5;
-      font-style: italic;
+      color: var(--accent);
+      margin-bottom: 10px;
+      line-height: 1.6;
+      padding: 8px 12px;
+      background: var(--accent-glow);
+      border-radius: var(--radius-sm);
+      border-left: 2px solid var(--accent);
     }
 
     .restaurant-address {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
       line-height: 1.4;
     }
 
@@ -273,189 +363,275 @@
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .tag {
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 10px;
-      font-weight: 600;
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
 
-    .tag.chicken { background: rgba(255, 165, 0, 0.15); color: #ffa500; }
-    .tag.protein { background: rgba(255, 71, 87, 0.15); color: #ff4757; }
-    .tag.healthy { background: rgba(0, 212, 170, 0.15); color: #00d4aa; }
-    .tag.salad { background: rgba(129, 236, 236, 0.15); color: #81ecec; }
+    .tag.chicken { background: rgba(255,165,0,0.12); color: #ffa500; }
+    .tag.protein { background: rgba(108,92,231,0.12); color: #a29bfe; }
+    .tag.healthy { background: rgba(0,212,170,0.12); color: var(--accent); }
+    .tag.salad { background: rgba(129,236,236,0.12); color: #81ecec; }
 
     .card-bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
-    .distance { font-size: 12px; color: #00d4aa; font-weight: 600; }
+    .distance {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .distance-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
 
     .navigate-btn {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 7px 14px;
-      background: #00d4aa;
-      color: #0f0f0f;
+      gap: 6px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--accent), #00b894);
+      color: var(--bg);
       border: none;
-      border-radius: 8px;
-      font-size: 12px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
       font-weight: 700;
+      font-family: inherit;
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
     }
 
-    .navigate-btn:hover { background: #00b894; }
+    .navigate-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(0,212,170,0.3);
+    }
 
+    /* ==================== LOADING ==================== */
     .loading-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 15, 15, 0.9);
+      background: rgba(10,10,15,0.92);
+      backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      transition: opacity 0.3s;
+      transition: opacity 0.4s;
     }
 
     .loading-overlay.hidden { opacity: 0; pointer-events: none; }
 
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid #333;
-      border-top-color: #00d4aa;
+    .spinner-ring {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { margin-top: 16px; color: #999; font-size: 14px; }
+
+    .loading-text {
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
 
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 48px 24px;
       text-align: center;
-      color: #666;
     }
 
-    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-    .empty-state p { font-size: 14px; line-height: 1.6; }
+    .empty-state .icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
 
+    .empty-state p {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* ==================== DETAIL ==================== */
     .detail-panel { display: none; flex-direction: column; height: 100%; }
     .detail-panel.active { display: flex; }
 
     .detail-back {
-      padding: 12px 16px;
-      border-bottom: 1px solid #333;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
-      color: #00d4aa;
-      font-size: 14px;
+      color: var(--accent);
+      font-size: 13px;
       font-weight: 600;
       flex-shrink: 0;
       transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .detail-back:hover { background: #222; }
+    .detail-back:hover { background: var(--surface); }
 
-    .detail-content { flex: 1; overflow-y: auto; padding: 16px; }
+    .detail-content { flex: 1; overflow-y: auto; padding: 20px; }
 
-    .detail-name { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .detail-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
 
     .detail-desc {
       font-size: 13px;
-      color: #81ecec;
-      line-height: 1.6;
-      margin-bottom: 16px;
-      padding: 10px 14px;
-      background: rgba(0, 212, 170, 0.08);
-      border-radius: 10px;
-      border-left: 3px solid #00d4aa;
+      color: var(--accent);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      background: var(--accent-glow);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--accent);
     }
 
-    .detail-info { font-size: 13px; color: #aaa; line-height: 2; margin-bottom: 16px; }
-    .detail-info strong { color: #ccc; }
-    .detail-info a { color: #00d4aa; }
+    .detail-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 2.2;
+      margin-bottom: 20px;
+    }
 
-    .detail-hours { background: #222; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
-    .detail-hours h4 { font-size: 13px; color: #00d4aa; margin-bottom: 8px; }
-    .detail-hours p { font-size: 12px; color: #aaa; line-height: 1.8; }
+    .detail-info strong { color: var(--text); font-weight: 600; }
+    .detail-info a { color: var(--accent); text-decoration: none; }
+    .detail-info a:hover { text-decoration: underline; }
+
+    .detail-hours {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+
+    .detail-hours h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-hours p { font-size: 12px; color: var(--text-secondary); line-height: 1.8; }
 
     .detail-actions { display: flex; gap: 10px; }
 
     .detail-actions a {
       flex: 1;
       text-align: center;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 14px;
+      border-radius: var(--radius);
       font-size: 13px;
       font-weight: 700;
+      font-family: inherit;
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
     }
 
-    .detail-actions a:hover { opacity: 0.85; }
-    .btn-navigate { background: #00d4aa; color: #0f0f0f; }
-    .btn-call { background: #333; color: #fff; }
+    .detail-actions a:hover { transform: translateY(-1px); }
 
+    .btn-navigate-lg {
+      background: linear-gradient(135deg, var(--accent), #00b894);
+      color: var(--bg);
+      box-shadow: 0 4px 16px rgba(0,212,170,0.25);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* ==================== MAP CUSTOM ==================== */
     .custom-marker {
-      width: 32px;
-      height: 32px;
-      background: #00d4aa;
-      border: 3px solid #008060;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #00b894);
+      border: 3px solid rgba(255,255,255,0.3);
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,212,170,0.3);
     }
 
-    .custom-marker span { transform: rotate(45deg); font-size: 14px; }
+    .custom-marker span { transform: rotate(45deg); font-size: 15px; }
 
     .leaflet-popup-content-wrapper {
-      background: #1a1a2e;
-      color: #e0e0e0;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      background: rgba(15,15,25,0.95);
+      backdrop-filter: blur(16px);
+      color: var(--text);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
 
-    .leaflet-popup-tip { background: #1a1a2e; }
+    .leaflet-popup-tip { background: rgba(15,15,25,0.95); }
 
     .leaflet-popup-content {
-      margin: 12px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 14px;
+      font-family: 'Inter', sans-serif;
     }
 
-    .popup-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .popup-desc { font-size: 11px; color: #81ecec; margin-bottom: 6px; }
-    .popup-addr { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .popup-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .popup-desc { font-size: 11px; color: var(--accent); margin-bottom: 8px; line-height: 1.4; }
+    .popup-addr { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
 
     .popup-nav {
       display: inline-block;
-      padding: 6px 14px;
-      background: #00d4aa;
-      color: #0f0f0f;
-      border-radius: 6px;
+      padding: 7px 16px;
+      background: linear-gradient(135deg, var(--accent), #00b894);
+      color: var(--bg);
+      border-radius: var(--radius-full);
       text-decoration: none;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
     }
 
+    /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
-      header { flex-direction: column; gap: 8px; padding: 10px 14px; }
-
+      header { flex-direction: column; gap: 10px; padding: 12px 16px; }
       .location-bar { max-width: 100%; }
 
       .filters {
@@ -473,7 +649,7 @@
         width: 100%;
         height: 45%;
         border-left: none;
-        border-top: 1px solid #333;
+        border-top: 1px solid var(--border);
       }
 
       #map { height: 55%; flex: none; }
@@ -484,21 +660,21 @@
   <header>
     <div class="logo">
       <div class="logo-icon">&#x1F357;</div>
-      <h1>
-        FitFood Map
+      <div class="logo-text">
+        <h1>FitFood Map</h1>
         <div class="subtitle">健身飲食地圖</div>
-      </h1>
+      </div>
     </div>
     <div class="location-bar">
-      <input type="text" id="locationInput" placeholder="輸入地址搜尋，例如：觀塘、旺角、中環..." onkeydown="if(event.key==='Enter')searchLocation()">
-      <button class="btn-search" onclick="searchLocation()">搜尋</button>
-      <button class="btn-gps" id="gpsBtn" onclick="useGPS()">GPS</button>
+      <input type="text" id="locationInput" placeholder="搜尋地址：觀塘、旺角、銅鑼灣..." onkeydown="if(event.key==='Enter')searchLocation()">
+      <button class="loc-btn btn-gps-icon" id="gpsBtn" onclick="useGPS()" title="GPS 定位">&#x1F4CD;</button>
+      <button class="loc-btn btn-search-icon" onclick="searchLocation()" title="搜尋">&#x2192;</button>
     </div>
     <div class="filters">
       <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">全部</button>
       <button class="filter-btn" data-filter="chicken" onclick="setFilter('chicken')">&#x1F414; 雞肉</button>
       <button class="filter-btn" data-filter="protein" onclick="setFilter('protein')">&#x1F4AA; 高蛋白</button>
-      <button class="filter-btn" data-filter="healthy" onclick="setFilter('healthy')">&#x1F96C; 健康餐</button>
+      <button class="filter-btn" data-filter="healthy" onclick="setFilter('healthy')">&#x1F96C; 健康</button>
       <button class="filter-btn" data-filter="salad" onclick="setFilter('salad')">&#x1F957; 沙律</button>
     </div>
   </header>
@@ -513,7 +689,7 @@
 
     <div class="sidebar">
       <div class="sidebar-header" id="listHeader">
-        <h2>附近餐廳</h2>
+        <h2>附近推薦</h2>
         <span class="result-count" id="resultCount">搜尋中...</span>
       </div>
       <div class="results-list" id="resultsList">
@@ -524,65 +700,59 @@
       </div>
 
       <div class="detail-panel" id="detailPanel">
-        <div class="detail-back" onclick="closeDetail()">&larr; 返回列表</div>
+        <div class="detail-back" onclick="closeDetail()">&#x2190; 返回列表</div>
         <div class="detail-content" id="detailContent"></div>
       </div>
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
-      <div class="spinner"></div>
-      <div class="loading-text">正在搜尋附近健康餐廳...</div>
+      <div class="spinner-ring"></div>
+      <div class="loading-text">搜尋緊附近健康餐廳...</div>
     </div>
   </div>
 
   <script>
-    // --- State ---
+    // ============================================================
+    // STATE
+    // ============================================================
     let map, userMarker;
     let markers = [];
     let allPlaces = [];
     let userPos = null;
     let currentFilter = 'all';
-    let gpsActive = false;
 
-    // --- Blacklist: unhealthy chains ---
+    // ============================================================
+    // BLACKLIST — 快餐連鎖、唔健康
+    // ============================================================
     const BLACKLIST = [
-      'kfc', '肯德基', "mcdonald", '麥當勞', 'burger king', '漢堡王',
-      'pizza hut', '必勝客', 'domino', "wendy", 'subway',
-      'popeyes', 'taco bell', 'five guys', "jack in the box",
-      "carl's jr", 'hardee', 'arby', 'dairy queen', 'dq',
-      'jollibee', '吉野家', 'yoshinoya', '松屋', 'matsuya',
-      '大家樂', '大快活', '美心', 'fairwood', 'cafe de coral', 'maxim',
-      'starbucks', '星巴克', "mccafe", '麥咖啡',
+      'kfc', '肯德基', 'mcdonald', '麥當勞', 'burger king', '漢堡王',
+      'pizza hut', '必勝客', 'domino', 'wendy', 'subway',
+      'popeyes', 'taco bell', 'five guys', 'jack in the box',
+      "carl's jr", 'hardee', "arby", 'dairy queen',
+      'jollibee', '吉野家', 'yoshinoya',
+      '大家樂', '大快活', 'cafe de coral', 'fairwood',
+      'starbucks', '星巴克', 'mccafe', '麥咖啡',
       '譚仔', '三哥'
     ];
 
-    // --- Category definitions ---
-    // --- Category definitions ---
-    // chicken = 以雞為主打嘅餐廳（原隻雞、鹽水雞、白切雞、燒雞等），唔係有雞字就算
-    // protein = 明確針對健身人群嘅餐廳（meal prep、健身餐等）
-    // healthy = 健康輕食、有機、素食等
-    // salad = 沙律、poke bowl 等
+    // ============================================================
+    // CATEGORIES — 寬鬆匹配，唔好漏走真正適合嘅餐廳
+    // ============================================================
     const CATEGORIES = {
       chicken: {
-        label: '雞肉主打', cls: 'chicken',
+        label: '雞肉', cls: 'chicken',
         cuisines: ['chicken', 'rotisserie'],
-        // 只匹配以雞為主打嘅名稱，唔係隨便有個雞字
-        namePatterns: [
-          '鹽水雞', '白切雞', '燒雞', '烤雞', '海南雞', '手撕雞',
-          '雞煲', '雞鍋', '雞專', '雞店', '雞王', '原隻雞',
-          'roast chicken', 'chicken shop', 'chicken rice',
-          'hainan chicken', 'rotisserie'
-        ],
-        excludePatterns: ['炸雞', 'fried chicken', 'fry', '脆雞', '雞蛋', '雞尾']
+        // 有「雞」字就算（會由 blacklist + exclude 過濾唔適合嘅）
+        namePatterns: ['雞', '鷄', 'chicken', 'chick'],
+        excludePatterns: ['炸雞', 'fried chicken', '脆雞', '雞蛋仔', '雞尾', '雞尾酒']
       },
       protein: {
         label: '高蛋白', cls: 'protein',
         cuisines: [],
-        // 只匹配明確針對健身人群嘅餐廳
         namePatterns: [
           '蛋白', 'protein', '健身', 'fitness', 'meal prep',
-          '增肌', 'gym', 'gains', 'macro', '減脂餐',
-          'muscle', 'fitfood', 'clean food'
+          '增肌', 'gym', 'gains', 'macro', '減脂',
+          'muscle', 'fitfood', 'clean food', 'bodybuilding'
         ]
       },
       healthy: {
@@ -590,50 +760,66 @@
         cuisines: ['health_food', 'vegetarian', 'vegan', 'organic', 'juice'],
         namePatterns: [
           '健康', 'healthy', '輕食', '低卡', '養生',
-          'organic', '有機', 'whole food', 'green', 'clean eat',
-          '素食', '齋', 'vegan', 'plant based'
+          'organic', '有機', 'whole food', 'green common',
+          'clean eat', '素食', '齋', 'vegan', 'plant based'
         ]
       },
       salad: {
         label: '沙律', cls: 'salad',
         cuisines: ['salad', 'poke'],
-        namePatterns: ['沙律', 'salad bar', 'poke bowl', 'poke', 'açaí', 'acai bowl']
+        namePatterns: ['沙律', 'salad', 'poke', 'açaí', 'acai']
       }
     };
 
-    // --- Fitness descriptions ---
+    // ============================================================
+    // DESCRIPTIONS — 根據分類生成適合健身人士嘅介紹
+    // ============================================================
     function generateDescription(place) {
       const cats = [...place.categories];
-      const parts = [];
       const nameLower = place.name.toLowerCase();
+      const parts = [];
 
       if (cats.includes('chicken')) {
-        if (nameLower.includes('鹽水雞') || nameLower.includes('白切雞')) {
-          parts.push('鹽水雞 / 白切雞以原隻雞製作，保留雞肉鮮味，少油烹調。每100g雞胸約含31g蛋白質、僅3.6g脂肪，係增肌減脂嘅理想選擇。');
-        } else if (nameLower.includes('海南雞') || nameLower.includes('hainan')) {
-          parts.push('海南雞飯以原隻雞為主打，雞肉蛋白質豐富。建議走皮、少飯，可以大幅降低脂肪同碳水攝取。');
-        } else if (nameLower.includes('燒雞') || nameLower.includes('烤雞') || nameLower.includes('rotisserie') || nameLower.includes('roast')) {
-          parts.push('原隻燒雞 / 烤雞，蛋白質豐富。建議走皮食用，每100g雞胸約含31g蛋白質，係健身人士嘅優質蛋白來源。');
+        if (nameLower.includes('鹽水雞') || nameLower.includes('白切雞') || nameLower.includes('蒸')) {
+          parts.push('鹽水雞 / 白切雞以原隻雞製作，少油烹調，每100g雞胸約含31g蛋白質、僅3.6g脂肪，增肌減脂首選。');
+        } else if (nameLower.includes('海南') || nameLower.includes('hainan')) {
+          parts.push('海南雞飯以原隻雞為主，蛋白質豐富。建議走皮、少飯，大幅降低脂肪同碳水攝取。');
+        } else if (nameLower.includes('燒') || nameLower.includes('烤') || nameLower.includes('roast') || nameLower.includes('rotisserie')) {
+          parts.push('原隻燒雞 / 烤雞蛋白質豐富，建議走皮食用。每100g雞胸約含31g蛋白質，優質蛋白來源。');
+        } else if (nameLower.includes('雞煲') || nameLower.includes('雞鍋')) {
+          parts.push('雞煲以原隻雞燉煮，蛋白質豐富，但留意醬汁熱量。建議少醬、多食雞肉部分。');
         } else {
-          parts.push('以雞肉為主打，雞肉係健身人士首選嘅蛋白質來源之一，低脂高蛋白，適合增肌減脂期間食用。');
+          parts.push('提供雞肉料理，雞肉係低脂高蛋白嘅肉類，每100g雞胸約含31g蛋白質，適合健身人士日常飲食。');
         }
       }
       if (cats.includes('protein')) {
-        parts.push('明確針對健身人群，提供高蛋白、可控制營養成分嘅餐食，方便追蹤每日蛋白質同熱量攝取。');
+        parts.push('專為健身人群而設，提供可控制營養成分嘅高蛋白餐食，方便追蹤每日蛋白質同熱量攝取。');
       }
       if (cats.includes('healthy')) {
         parts.push('主打健康飲食，注重營養均衡、低油低鹽，食材新鮮天然，適合減脂期控制熱量攝取。');
       }
       if (cats.includes('salad')) {
-        parts.push('提供新鮮沙律，高纖低卡。建議揀含雞肉、蛋或豆腐等蛋白質配料，兼顧飽肚感同營養攝取。');
+        parts.push('提供新鮮沙律，高纖低卡。建議揀含雞肉、蛋或豆腐等蛋白質配料，兼顧飽肚感同營養。');
       }
 
       return parts.join(' ') || '提供適合健身人士嘅餐食選擇。';
     }
 
-    // --- Init ---
+    // ============================================================
+    // GOOGLE MAPS URL — 用餐廳全名搜尋，搵到真正嘅鋪
+    // ============================================================
+    function getMapsUrl(place) {
+      const destination = place.address
+        ? `${place.name}, ${place.address}`
+        : place.name;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
     function initApp() {
-      const defaultPos = [22.3193, 114.1694]; // Hong Kong
+      const defaultPos = [22.3193, 114.1694];
 
       map = L.map('map', {
         center: defaultPos,
@@ -645,68 +831,65 @@
         maxZoom: 19
       }).addTo(map);
 
-      // Try GPS automatically
       useGPS();
     }
 
-    // --- GPS ---
+    // ============================================================
+    // LOCATION
+    // ============================================================
     function useGPS() {
       updateLocationStatus('locating', '正在透過 GPS 定位...');
 
       if (!navigator.geolocation) {
-        updateLocationStatus('error', 'GPS 不可用，請手動輸入地址搜尋');
+        updateLocationStatus('error', 'GPS 不可用，請手動輸入地址');
+        fallbackNoLocation();
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          gpsActive = true;
           document.getElementById('gpsBtn').classList.add('active');
           map.setView([userPos.lat, userPos.lng], 15);
           addUserMarker();
-
-          // Reverse geocode to show location name
           reverseGeocode(userPos.lat, userPos.lng);
-
           searchNearby();
         },
-        (err) => {
-          gpsActive = false;
-          updateLocationStatus('error', 'GPS 定位失敗 — 請喺上面搜尋欄輸入你嘅地址');
-
-          // Still set a default position but don't auto-search
-          userPos = { lat: 22.3193, lng: 114.1694 };
-          map.setView([userPos.lat, userPos.lng], 13);
-
-          document.getElementById('loadingOverlay').classList.add('hidden');
-          document.getElementById('resultsList').innerHTML = `
-            <div class="empty-state">
-              <div class="icon">&#x1F4CD;</div>
-              <p>未能取得你嘅位置<br><br>請喺上方搜尋欄輸入地址<br>例如：觀塘、旺角、銅鑼灣</p>
-            </div>`;
-          document.getElementById('resultCount').textContent = '未定位';
+        () => {
+          updateLocationStatus('error', 'GPS 定位失敗 — 請喺搜尋欄輸入你嘅地址');
+          fallbackNoLocation();
         },
         { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
       );
     }
 
+    function fallbackNoLocation() {
+      userPos = { lat: 22.3193, lng: 114.1694 };
+      map.setView([userPos.lat, userPos.lng], 13);
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      document.getElementById('resultsList').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">&#x1F4CD;</div>
+          <p>未能取得你嘅位置<br><br>請喺上方搜尋欄輸入地址<br>例如：觀塘、旺角、銅鑼灣</p>
+        </div>`;
+      document.getElementById('resultCount').textContent = '未定位';
+    }
+
     async function reverseGeocode(lat, lng) {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${lat},${lng}&format=json&limit=1&addressdetails=1`, { headers: { 'Accept': 'application/json' } });
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=16`, { headers: { 'Accept': 'application/json' } });
         const data = await res.json();
-        if (data.length > 0 && data[0].display_name) {
-          const name = data[0].display_name.split(',').slice(0, 3).join(', ');
-          updateLocationStatus('located', `${name}`);
+        if (data.display_name) {
+          const name = data.display_name.split(',').slice(0, 3).join(', ');
+          updateLocationStatus('located', name);
         } else {
-          updateLocationStatus('located', `GPS 定位成功 (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+          updateLocationStatus('located', `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
         }
       } catch {
-        updateLocationStatus('located', `GPS 定位成功 (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+        updateLocationStatus('located', `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
       }
     }
 
-    // --- Location search ---
     async function searchLocation() {
       const input = document.getElementById('locationInput').value.trim();
       if (!input) return;
@@ -721,15 +904,11 @@
         if (data.length > 0) {
           const result = data[0];
           userPos = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) };
-          gpsActive = false;
           document.getElementById('gpsBtn').classList.remove('active');
-
           map.setView([userPos.lat, userPos.lng], 15);
           addUserMarker();
-
           const displayName = result.display_name.split(',').slice(0, 3).join(', ');
           updateLocationStatus('located', displayName);
-
           searchNearby();
         } else {
           updateLocationStatus('error', `搵唔到「${input}」，請試其他地址`);
@@ -742,31 +921,30 @@
     }
 
     function updateLocationStatus(state, text) {
-      const dot = document.getElementById('locationDot');
-      const label = document.getElementById('locationText');
-      dot.className = 'dot' + (state === 'located' ? ' located' : '');
-      label.textContent = text;
+      document.getElementById('locationDot').className = 'dot' + (state === 'located' ? ' located' : '');
+      document.getElementById('locationText').textContent = text;
     }
 
     function addUserMarker() {
       if (userMarker) map.removeLayer(userMarker);
       const icon = L.divIcon({
-        html: '<div style="width:18px;height:18px;background:#4285f4;border:3px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(66,133,244,0.6)"></div>',
+        html: '<div style="width:16px;height:16px;background:#4285f4;border:3px solid #fff;border-radius:50%;box-shadow:0 0 12px rgba(66,133,244,0.5)"></div>',
         className: '',
-        iconSize: [18, 18],
-        iconAnchor: [9, 9]
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
       });
       userMarker = L.marker([userPos.lat, userPos.lng], { icon, zIndexOffset: 1000 }).addTo(map);
-      userMarker.bindPopup('<b>你嘅位置</b>').openPopup();
+      userMarker.bindPopup('<b style="font-family:Inter,sans-serif;font-size:13px">你嘅位置</b>').openPopup();
     }
 
-    // --- Search via Overpass API ---
+    // ============================================================
+    // SEARCH
+    // ============================================================
     async function searchNearby() {
       document.getElementById('loadingOverlay').classList.remove('hidden');
 
       const radius = 2000;
-      const lat = userPos.lat;
-      const lng = userPos.lng;
+      const { lat, lng } = userPos;
 
       const query = `
         [out:json][timeout:30];
@@ -789,38 +967,34 @@
         if (data.elements) {
           allPlaces = data.elements
             .map(el => {
-              const placeLat = el.lat || el.center?.lat;
-              const placeLng = el.lon || el.center?.lon;
-              if (!placeLat || !placeLng) return null;
+              const pLat = el.lat || el.center?.lat;
+              const pLng = el.lon || el.center?.lon;
+              if (!pLat || !pLng) return null;
 
               const tags = el.tags || {};
               const name = tags.name || tags['name:zh'] || tags['name:en'] || '';
               if (!name) return null;
-
-              // Blacklist check
               if (isBlacklisted(name, tags)) return null;
 
               const cuisine = (tags.cuisine || '').toLowerCase();
               const categories = categorizePlace(name, cuisine, tags);
-
               if (categories.size === 0) return null;
 
               const place = {
                 id: el.id,
-                lat: placeLat,
-                lng: placeLng,
-                name: name,
+                lat: pLat,
+                lng: pLng,
+                name,
                 nameEn: tags['name:en'] || '',
                 cuisine: tags.cuisine || '',
                 address: formatAddress(tags),
                 phone: tags.phone || tags['contact:phone'] || '',
                 website: tags.website || tags['contact:website'] || '',
                 openingHours: tags.opening_hours || '',
-                categories: categories,
-                distance: calcDistance(userPos, { lat: placeLat, lng: placeLng }),
-                tags: tags
+                categories,
+                distance: calcDistance(userPos, { lat: pLat, lng: pLng }),
+                tags
               };
-
               place.description = generateDescription(place);
               return place;
             })
@@ -862,14 +1036,11 @@
             if (allText.includes(p.toLowerCase())) { matched = true; break; }
           }
         }
-
-        // Check exclude patterns (e.g. fried chicken)
         if (matched && cat.excludePatterns) {
           for (const ep of cat.excludePatterns) {
             if (allText.includes(ep.toLowerCase())) { matched = false; break; }
           }
         }
-
         if (matched) cats.add(catKey);
       }
 
@@ -890,7 +1061,9 @@
       return parts.join(' ') || '';
     }
 
-    // --- Utils ---
+    // ============================================================
+    // UTILS
+    // ============================================================
     function calcDistance(from, to) {
       const R = 6371;
       const dLat = (to.lat - from.lat) * Math.PI / 180;
@@ -906,15 +1079,9 @@
       return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
     }
 
-    // Google Maps URL: 用餐廳全名 + 地址，等 Google Maps 搵到間鋪
-    function getMapsUrl(place) {
-      const destination = place.address
-        ? `${place.name}, ${place.address}`
-        : place.name;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
-    }
-
-    // --- Filter ---
+    // ============================================================
+    // FILTER
+    // ============================================================
     function setFilter(filter) {
       currentFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -928,14 +1095,16 @@
       return allPlaces.filter(p => p.categories.has(currentFilter));
     }
 
-    // --- Render ---
+    // ============================================================
+    // RENDER
+    // ============================================================
     function renderResults() {
       clearMarkers();
       closeDetail();
 
       const places = getFilteredPlaces();
       const list = document.getElementById('resultsList');
-      document.getElementById('resultCount').textContent = `${places.length} 間餐廳`;
+      document.getElementById('resultCount').textContent = `${places.length} 間`;
 
       if (places.length === 0) {
         list.innerHTML = `
@@ -952,14 +1121,13 @@
         const markerIcon = L.divIcon({
           html: '<div class="custom-marker"><span>&#x1F357;</span></div>',
           className: '',
-          iconSize: [32, 32],
-          iconAnchor: [16, 32],
-          popupAnchor: [0, -32]
+          iconSize: [36, 36],
+          iconAnchor: [18, 36],
+          popupAnchor: [0, -36]
         });
 
         const mapsUrl = getMapsUrl(place);
-
-        const shortDesc = place.description.length > 60 ? place.description.substring(0, 58) + '...' : place.description;
+        const shortDesc = place.description.length > 55 ? place.description.substring(0, 53) + '...' : place.description;
 
         const marker = L.marker([place.lat, place.lng], { icon: markerIcon }).addTo(map);
         marker.bindPopup(`
@@ -968,7 +1136,6 @@
           ${place.address ? `<div class="popup-addr">${place.address}</div>` : ''}
           <a class="popup-nav" href="${mapsUrl}" target="_blank" rel="noopener">Google Maps 導航</a>
         `);
-
         markers.push(marker);
 
         const card = document.createElement('div');
@@ -989,7 +1156,7 @@
           ${place.address ? `<div class="restaurant-address">${place.address}</div>` : ''}
           <div class="tags">${tagsHTML}</div>
           <div class="card-bottom">
-            <div class="distance">&#x1F4CD; ${formatDistance(place.distance)}</div>
+            <div class="distance"><span class="distance-dot"></span>${formatDistance(place.distance)}</div>
             <a class="navigate-btn" href="${mapsUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">導航</a>
           </div>
         `;
@@ -1005,8 +1172,7 @@
       });
 
       if (markers.length > 0) {
-        const group = L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.1));
+        map.fitBounds(L.featureGroup(markers).getBounds().pad(0.1));
       }
     }
 
@@ -1024,28 +1190,20 @@
       markers = [];
     }
 
-    // --- Detail panel ---
+    // ============================================================
+    // DETAIL
+    // ============================================================
     function openDetail(place) {
       const panel = document.getElementById('detailPanel');
       const content = document.getElementById('detailContent');
-      const list = document.getElementById('resultsList');
-      const header = document.getElementById('listHeader');
 
       const mapsUrl = getMapsUrl(place);
       const osmUrl = `https://www.openstreetmap.org/node/${place.id}`;
 
       let hoursHTML = '';
       if (place.openingHours) {
-        const formatted = place.openingHours
-          .split(';')
-          .map(h => `<p>${h.trim()}</p>`)
-          .join('');
-        hoursHTML = `
-          <div class="detail-hours">
-            <h4>營業時間</h4>
-            ${formatted}
-          </div>
-        `;
+        const formatted = place.openingHours.split(';').map(h => `<p>${h.trim()}</p>`).join('');
+        hoursHTML = `<div class="detail-hours"><h4>營業時間</h4>${formatted}</div>`;
       }
 
       let tagsHTML = '';
@@ -1056,25 +1214,25 @@
 
       content.innerHTML = `
         <div class="detail-name">${place.name}</div>
-        ${place.nameEn ? `<div style="color:#888;font-size:13px;margin-bottom:12px">${place.nameEn}</div>` : ''}
+        ${place.nameEn ? `<div style="color:var(--text-muted);font-size:13px;margin-bottom:12px">${place.nameEn}</div>` : ''}
         <div class="tags" style="margin-bottom:12px">${tagsHTML}</div>
         <div class="detail-desc">${place.description}</div>
         <div class="detail-info">
-          ${place.address ? `<strong>地址：</strong>${place.address}<br>` : ''}
-          ${place.phone ? `<strong>電話：</strong><a href="tel:${place.phone}">${place.phone}</a><br>` : ''}
-          ${place.website ? `<strong>網站：</strong><a href="${place.website}" target="_blank" rel="noopener">查看網站</a><br>` : ''}
-          ${place.cuisine ? `<strong>菜式：</strong>${place.cuisine}<br>` : ''}
-          <strong>距離：</strong>${formatDistance(place.distance)}
+          ${place.address ? `<strong>地址</strong> ${place.address}<br>` : ''}
+          ${place.phone ? `<strong>電話</strong> <a href="tel:${place.phone}">${place.phone}</a><br>` : ''}
+          ${place.website ? `<strong>網站</strong> <a href="${place.website}" target="_blank" rel="noopener">查看</a><br>` : ''}
+          ${place.cuisine ? `<strong>菜式</strong> ${place.cuisine}<br>` : ''}
+          <strong>距離</strong> ${formatDistance(place.distance)}
         </div>
         ${hoursHTML}
         <div class="detail-actions">
-          <a class="btn-navigate" href="${mapsUrl}" target="_blank" rel="noopener">Google Maps 導航</a>
-          ${place.phone ? `<a class="btn-call" href="tel:${place.phone}">致電餐廳</a>` : `<a class="btn-call" href="${osmUrl}" target="_blank" rel="noopener">查看地圖</a>`}
+          <a class="btn-navigate-lg" href="${mapsUrl}" target="_blank" rel="noopener">Google Maps 導航</a>
+          ${place.phone ? `<a class="btn-secondary" href="tel:${place.phone}">致電餐廳</a>` : `<a class="btn-secondary" href="${osmUrl}" target="_blank" rel="noopener">查看地圖</a>`}
         </div>
       `;
 
-      header.style.display = 'none';
-      list.style.display = 'none';
+      document.getElementById('listHeader').style.display = 'none';
+      document.getElementById('resultsList').style.display = 'none';
       panel.classList.add('active');
     }
 
@@ -1084,7 +1242,9 @@
       document.getElementById('listHeader').style.display = '';
     }
 
-    // --- Start ---
+    // ============================================================
+    // START
+    // ============================================================
     initApp();
   </script>
 </body>
