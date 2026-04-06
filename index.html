@@ -736,6 +736,45 @@
     ];
 
     // ============================================================
+    // CURATED — 香港熱門健康雞肉連鎖，OSM 數據庫冇收錄
+    // ============================================================
+    const CURATED_CHAINS = [
+      {
+        brand: 'Chicken Factory',
+        nameZh: 'Chicken Factory',
+        categories: ['chicken', 'healthy'],
+        description: '主打少鹽少糖嘅健康雞肉料理，提供多款烤雞、雞胸餐等高蛋白低脂選擇，全港超過30間分店，深受健身人士歡迎。',
+        branches: [
+          { name: 'Chicken Factory (啟鑽苑)', address: '鑽石山彩虹道235號啟鑽苑地下G23號舖', lat: 22.3432, lng: 114.2037 },
+          { name: 'Chicken Factory (將軍澳廣場)', address: '將軍澳唐德街1號將軍澳廣場', lat: 22.3074, lng: 114.2605 },
+          { name: 'Chicken Factory (九龍灣)', address: '九龍灣啟業道18號啟業商場地下5號舖', lat: 22.3231, lng: 114.2132 },
+          { name: 'Chicken Factory (荃灣)', address: '荃灣楊屋道18號荃新天地2 UG樓UG81號舖', lat: 22.3725, lng: 114.1148 },
+          { name: 'Chicken Factory (大埔)', address: '大埔南運路9號大埔超級城097號舖', lat: 22.4507, lng: 114.1688 },
+          { name: 'Chicken Factory (粉嶺)', address: '粉嶺一鳴路18號華心商場1樓R120-123號舖', lat: 22.4921, lng: 114.1385 },
+          { name: 'Chicken Factory (香港仔)', address: '香港仔南寧街6-12號香港仔中心地下', lat: 22.2480, lng: 114.1550 },
+          { name: 'Chicken Factory (馬鞍山)', address: '馬鞍山西沙路608號馬鞍山廣場', lat: 22.4253, lng: 114.2318 },
+          { name: 'Chicken Factory (觀塘)', address: '觀塘開源道62號駱駝漆大廈3期地下', lat: 22.3113, lng: 114.2263 },
+          { name: 'Chicken Factory (旺角)', address: '旺角亞皆老街8號朗豪坊', lat: 22.3185, lng: 114.1686 },
+          { name: 'Chicken Factory (沙田)', address: '沙田正街18號新城市廣場', lat: 22.3816, lng: 114.1888 },
+          { name: 'Chicken Factory (元朗)', address: '元朗青山公路-元朗段249-251號', lat: 22.4445, lng: 114.0228 },
+          { name: 'Chicken Factory (屯門)', address: '屯門屯隆街3號屯門時代廣場', lat: 22.3910, lng: 113.9760 },
+          { name: 'Chicken Factory (天水圍)', address: '天水圍天恩路12-18號置富嘉湖', lat: 22.4541, lng: 114.0013 },
+          { name: 'Chicken Factory (黃大仙)', address: '黃大仙龍翔道136號黃大仙中心', lat: 22.3422, lng: 114.1940 },
+          { name: 'Chicken Factory (樂富)', address: '樂富橫頭磡南道198號樂富廣場', lat: 22.3382, lng: 114.1878 },
+          { name: 'Chicken Factory (太古)', address: '太古英皇道1111號太古城中心', lat: 22.2860, lng: 114.2172 },
+          { name: 'Chicken Factory (銅鑼灣)', address: '銅鑼灣軒尼詩道500號希慎廣場', lat: 22.2800, lng: 114.1840 }
+        ]
+      },
+      {
+        brand: 'FITTERY',
+        nameZh: 'FITTERY',
+        categories: ['protein', 'healthy'],
+        description: '專為健身人士設計嘅健康餐盒，由米芝蓮餐廳主廚設計，每餐標示卡路里及營養成分，Deliveroo 評分4.8。',
+        branches: []
+      }
+    ];
+
+    // ============================================================
     // CATEGORIES — 寬鬆匹配，唔好漏走真正適合嘅餐廳
     // ============================================================
     const CATEGORIES = {
@@ -965,57 +1004,88 @@
     }
 
     // ============================================================
-    // SEARCH
+    // SEARCH — Overpass + 人手整理數據
     // ============================================================
     async function searchNearby() {
       document.getElementById('loadingOverlay').classList.remove('hidden');
 
-      const radius = 2000;
+      const radius = 3000;
       const { lat, lng } = userPos;
 
-      const query = `[out:json][timeout:25];(node["amenity"="restaurant"](around:${radius},${lat},${lng});node["amenity"="fast_food"](around:${radius},${lat},${lng});node["amenity"="cafe"](around:${radius},${lat},${lng});node["amenity"="food_court"](around:${radius},${lat},${lng});way["amenity"="restaurant"](around:${radius},${lat},${lng});way["amenity"="fast_food"](around:${radius},${lat},${lng}););out center tags;`;
+      // Overpass query — 3km 範圍，更多 tag 類型
+      const query = `[out:json][timeout:25];(node["amenity"~"restaurant|fast_food|cafe|food_court"](around:${radius},${lat},${lng});way["amenity"~"restaurant|fast_food|cafe|food_court"](around:${radius},${lat},${lng});node["shop"~"deli|health_food|butcher"](around:${radius},${lat},${lng}););out center tags;`;
 
       try {
         const data = await fetchOverpass(query);
 
+        const seenNames = new Set();
+        allPlaces = [];
+
+        // — 處理 Overpass 結果 —
         if (data.elements) {
-          allPlaces = data.elements
-            .map(el => {
-              const pLat = el.lat || el.center?.lat;
-              const pLng = el.lon || el.center?.lon;
-              if (!pLat || !pLng) return null;
+          for (const el of data.elements) {
+            const pLat = el.lat || el.center?.lat;
+            const pLng = el.lon || el.center?.lon;
+            if (!pLat || !pLng) continue;
 
-              const tags = el.tags || {};
-              const name = tags.name || tags['name:zh'] || tags['name:en'] || '';
-              if (!name) return null;
-              if (isBlacklisted(name, tags)) return null;
+            const tags = el.tags || {};
+            const name = tags.name || tags['name:zh'] || tags['name:en'] || '';
+            if (!name) continue;
+            if (isBlacklisted(name, tags)) continue;
 
-              const cuisine = (tags.cuisine || '').toLowerCase();
-              const categories = categorizePlace(name, cuisine, tags);
-              if (categories.size === 0) return null;
+            const cuisine = (tags.cuisine || '').toLowerCase();
+            const categories = categorizePlace(name, cuisine, tags);
+            if (categories.size === 0) continue;
 
-              const place = {
-                id: el.id,
-                lat: pLat,
-                lng: pLng,
-                name,
-                nameEn: tags['name:en'] || '',
-                cuisine: tags.cuisine || '',
-                address: formatAddress(tags),
-                phone: tags.phone || tags['contact:phone'] || '',
-                website: tags.website || tags['contact:website'] || '',
-                openingHours: tags.opening_hours || '',
-                categories,
-                distance: calcDistance(userPos, { lat: pLat, lng: pLng }),
-                tags
-              };
-              place.description = generateDescription(place);
-              return place;
-            })
-            .filter(Boolean)
-            .sort((a, b) => a.distance - b.distance);
+            const place = {
+              id: el.id,
+              lat: pLat,
+              lng: pLng,
+              name,
+              nameEn: tags['name:en'] || '',
+              cuisine: tags.cuisine || '',
+              address: formatAddress(tags),
+              phone: tags.phone || tags['contact:phone'] || '',
+              website: tags.website || tags['contact:website'] || '',
+              openingHours: tags.opening_hours || '',
+              categories,
+              distance: calcDistance(userPos, { lat: pLat, lng: pLng }),
+              tags
+            };
+            place.description = generateDescription(place);
+            allPlaces.push(place);
+            seenNames.add(name.toLowerCase());
+          }
         }
 
+        // — 加入人手整理嘅連鎖店數據（補充 OSM 冇收錄嘅餐廳）—
+        for (const chain of CURATED_CHAINS) {
+          for (const branch of chain.branches) {
+            if (seenNames.has(branch.name.toLowerCase())) continue;
+            const dist = calcDistance(userPos, { lat: branch.lat, lng: branch.lng });
+            if (dist > 3) continue;
+
+            const cats = new Set(chain.categories);
+            const place = {
+              id: 'cur_' + branch.name.replace(/\s/g, '_'),
+              lat: branch.lat, lng: branch.lng,
+              name: branch.name,
+              nameEn: chain.brand,
+              cuisine: '',
+              address: branch.address,
+              phone: '', website: '', openingHours: '',
+              categories: cats,
+              distance: dist,
+              tags: {},
+              isCurated: true
+            };
+            place.description = chain.description;
+            allPlaces.push(place);
+            seenNames.add(branch.name.toLowerCase());
+          }
+        }
+
+        allPlaces.sort((a, b) => a.distance - b.distance);
         renderResults();
       } catch (err) {
         console.error('Search error:', err);
