@@ -739,9 +739,9 @@
     // CURATED — 香港熱門健康雞肉連鎖，OSM 數據庫冇收錄
     // ============================================================
     const CURATED_CHAINS = [
+      // ── Chicken Factory（少鹽少糖健康雞，34+分店）──
       {
         brand: 'Chicken Factory',
-        nameZh: 'Chicken Factory',
         categories: ['chicken', 'healthy'],
         description: '主打少鹽少糖嘅健康雞肉料理，提供多款烤雞、雞胸餐等高蛋白低脂選擇，全港超過30間分店，深受健身人士歡迎。',
         branches: [
@@ -762,15 +762,100 @@
           { name: 'Chicken Factory (黃大仙)', address: '黃大仙龍翔道136號黃大仙中心', lat: 22.3422, lng: 114.1940 },
           { name: 'Chicken Factory (樂富)', address: '樂富橫頭磡南道198號樂富廣場', lat: 22.3382, lng: 114.1878 },
           { name: 'Chicken Factory (太古)', address: '太古英皇道1111號太古城中心', lat: 22.2860, lng: 114.2172 },
-          { name: 'Chicken Factory (銅鑼灣)', address: '銅鑼灣軒尼詩道500號希慎廣場', lat: 22.2800, lng: 114.1840 }
+          { name: 'Chicken Factory (銅鑼灣)', address: '銅鑼灣軒尼詩道500號希慎廣場', lat: 22.2800, lng: 114.1840 },
+          { name: 'Chicken Factory (紅磡)', address: '紅磡馬頭圍道37-39號紅磡商業中心', lat: 22.3044, lng: 114.1872 },
+          { name: 'Chicken Factory (深水埗)', address: '深水埗長沙灣道681號西九龍中心', lat: 22.3310, lng: 114.1593 },
+          { name: 'Chicken Factory (油塘)', address: '油塘鯉魚門道12號大本型', lat: 22.2975, lng: 114.2376 }
         ]
       },
+      // ── 全日雞實驗所（關注組第1名海南雞）──
       {
-        brand: 'FITTERY',
-        nameZh: 'FITTERY',
-        categories: ['protein', 'healthy'],
-        description: '專為健身人士設計嘅健康餐盒，由米芝蓮餐廳主廚設計，每餐標示卡路里及營養成分，Deliveroo 評分4.8。',
-        branches: []
+        brand: '全日雞實驗所 All Day Chicken Lab',
+        categories: ['chicken'],
+        description: '海南雞飯關注組第1名！前君悅酒店廚師主理，招牌溫泉海南雞以低溫慢煮保持粉嫩口感，走皮食用每100g約含25g蛋白質���低脂高蛋白之選。',
+        branches: [
+          { name: '全日雞實驗所 (北角)', address: '北角和富道21-53號和富薈地庫B50-51號舖', lat: 22.2920, lng: 114.2010 },
+          { name: '全日雞實驗所 (旺角)', address: '旺角通菜街80號地下', lat: 22.3192, lng: 114.1710 }
+        ]
+      },
+      // ── 金雞去骨海南雞專門店（西貢名店）──
+      {
+        brand: '金雞去骨海南雞專門店',
+        categories: ['chicken'],
+        description: '西貢馳名去骨海南雞，雞肉嫩滑多汁，去骨方便食用。海南雞以水煮製作，低脂高蛋白，每100g雞肉約含25g蛋白質，配油飯同雞湯。',
+        branches: [
+          { name: '金雞去骨海南雞 (西貢)', address: '西貢福民路34號地舖', lat: 22.3815, lng: 114.2713 },
+          { name: '金雞去骨海南雞 (九龍城)', address: '九龍城衙前圍道84號地下B號舖', lat: 22.3360, lng: 114.1910 },
+          { name: '金雞去骨海南雞 (佐敦)', address: '佐敦白加士街85號地舖', lat: 22.3050, lng: 114.1700 },
+          { name: '金雞去骨海南雞 (荃灣)', address: '荃灣昌泰街3-5號富榮大廈地下2號舖', lat: 22.3710, lng: 114.1140 },
+          { name: '金雞去骨海南雞 (北角)', address: '北角英皇道560號健威坊地下L15號舖', lat: 22.2910, lng: 114.2010 }
+        ]
+      },
+      // ── 勇記海南雞（前君悅酒店廚師主理）──
+      {
+        brand: '勇記海南雞',
+        categories: ['chicken'],
+        description: '前君悅酒店大廚主理，招牌粉嫩滑雞配油飯同椰子雞湯，每日限量供應。雞肉以低溫浸煮保持嫩滑，去皮後低脂高蛋白，健身人士恩物。',
+        branches: [
+          { name: '勇記海南雞 (紅磡)', address: '紅磡馬頭圍道23-35H號隆基大樓地下29L號舖', lat: 22.3072, lng: 114.1878 },
+          { name: '勇記海南雞 (上環)', address: '上環蘇杭街102號江寧大廈地舖', lat: 22.2870, lng: 114.1520 },
+          { name: '勇記海南雞 (觀塘)', address: '觀塘駿業街', lat: 22.3130, lng: 114.2240 }
+        ]
+      },
+      // ── 泰亞萊海南雞專門店（多間分店）──
+      {
+        brand: '泰亞萊海南雞專門店 Thai Appetizing',
+        categories: ['chicken'],
+        description: '泰式海南雞專門店，提供正宗泰式白切雞、油雞等，配特製辣醬。雞肉蛋白質豐富，走皮走醬食用適合控制熱量嘅健身人士。',
+        branches: [
+          { name: '泰亞萊海南雞 (荔枝角)', address: '荔枝角長順街億利工業中心地下6A6號舖', lat: 22.3370, lng: 114.1480 },
+          { name: '泰亞萊海南雞 (新蒲崗)', address: '新蒲崗大有街14號萬星工業大廈地下C2號舖', lat: 22.3385, lng: 114.1970 },
+          { name: '泰亞萊海南雞 (葵涌)', address: '葵涌華星街1-7號美華工業大廈地下C5-C6號舖', lat: 22.3580, lng: 114.1280 },
+          { name: '泰亞萊海南雞 (深水埗)', address: '深水埗福榮街97號地舖', lat: 22.3300, lng: 114.1600 },
+          { name: '泰亞萊海南雞 (紅磡)', address: '紅磡庇利街32號地舖', lat: 22.3060, lng: 114.1860 },
+          { name: '泰亞萊海南雞 (沙田石門)', address: '沙田石門安麗街18號達利廣場地下4號C舖', lat: 22.3880, lng: 114.2080 },
+          { name: '泰亞萊海南雞 (黃大仙)', address: '黃大仙龍翔道136號黃大仙中心北館1樓N141號舖', lat: 22.3420, lng: 114.1940 },
+          { name: '泰亞萊海南雞 (九龍灣)', address: '九龍灣牛頭角道77號淘大商場3期地下G266-270號舖', lat: 22.3210, lng: 114.2130 }
+        ]
+      },
+      // ── Goobne Chicken（韓國烤雞，非油炸）──
+      {
+        brand: 'Goobne Chicken 굽네치킨',
+        categories: ['chicken', 'healthy'],
+        description: '韓國人氣烤雞品牌，主打「烤」而非「炸」，比傳統炸雞少油脂。招牌火山烤雞以焗爐烤製，保留雞肉蛋白質同時大幅降低脂肪含量。',
+        branches: [
+          { name: 'Goobne Chicken (尖沙咀)', address: '尖沙咀赫德道4號The Hart 2樓', lat: 22.2980, lng: 114.1730 },
+          { name: 'Goobne Chicken (旺角)', address: '旺角彌敦道628號瓊華中心15樓', lat: 22.3200, lng: 114.1700 },
+          { name: 'Goobne Chicken (銅鑼灣)', address: '銅鑼灣登龍街18號V Point 25樓', lat: 22.2790, lng: 114.1830 },
+          { name: 'Goobne Chicken (中環)', address: '中環威靈頓街2-8號威靈頓廣場M88 5樓', lat: 22.2830, lng: 114.1560 },
+          { name: 'Goobne Chicken (荃灣)', address: '荃灣楊屋道1號荃新天地一期地下G29號舖', lat: 22.3720, lng: 114.1150 },
+          { name: 'Goobne Chicken (將軍澳)', address: '將軍澳唐賢街19號天晉匯II期1樓119A號舖', lat: 22.3080, lng: 114.2600 },
+          { name: 'Goobne Chicken (東涌)', address: '東涌達東路20號東薈城2期7樓701號舖', lat: 22.2890, lng: 113.9420 }
+        ]
+      },
+      // ── Green Common（健康素食連鎖）──
+      {
+        brand: 'Green Common',
+        categories: ['healthy'],
+        description: '全港最大素食連鎖餐廳，提供植物肉、素食漢堡等高蛋白植物性飲食。適合想減少動物脂肪攝取嘅健身人士，蛋白質來源多元化。',
+        branches: [
+          { name: 'Green Common (尖沙咀)', address: '尖沙咀彌敦道132號美麗華商場B1', lat: 22.2990, lng: 114.1720 },
+          { name: 'Green Common (銅鑼灣)', address: '銅鑼灣勿地臣街1號時代廣場B2', lat: 22.2800, lng: 114.1830 },
+          { name: 'Green Common (九龍塘)', address: '九龍塘達之路80號又一城LG2', lat: 22.3370, lng: 114.1740 },
+          { name: 'Green Common (沙田)', address: '沙田正街18號新城市廣場一期3樓', lat: 22.3816, lng: 114.1888 },
+          { name: 'Green Common (將軍澳)', address: '將軍澳唐德街9號將軍澳中心', lat: 22.3080, lng: 114.2590 },
+          { name: 'Green Common (旺角)', address: '旺角亞皆老街8號朗豪坊', lat: 22.3185, lng: 114.1686 }
+        ]
+      },
+      // ── 淺草炸雞 KARAYAMA（日式炸雞定食）──
+      {
+        brand: '淺草炸雞 KARAYAMA',
+        categories: ['chicken'],
+        description: '日式炸雞專門店，招牌炸雞定食份量十足。雖然係炸雞但蛋白質含量高，建議配沙律代替白飯，控制碳水攝取同時補充蛋白質。',
+        branches: [
+          { name: '淺草炸雞 KARAYAMA (新蒲崗)', address: '新蒲崗四美街8號百匯中心地下', lat: 22.3380, lng: 114.1965 },
+          { name: '淺草炸雞 KARAYAMA (觀塘)', address: '觀塘成業街10號電訊一代廣場', lat: 22.3120, lng: 114.2250 }
+        ]
       }
     ];
 
