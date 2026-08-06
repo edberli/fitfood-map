@@ -922,118 +922,9 @@
     // ============================================================
     // CURATED CHAINS
     // ============================================================
-    const CURATED_CHAINS = [
-      {
-        brand: 'Chicken Factory',
-        categories: ['chicken', 'healthy'],
-        description: '主打少鹽少糖嘅健康雞肉料理，提供多款烤雞、雞胸餐等高蛋白低脂選擇，全港超過30間分店，深受健身人士歡迎。',
-        branches: [
-          { name: 'Chicken Factory (啟鑽苑)', address: '鑽石山彩虹道235號啟鑽苑地下G23號舖', lat: 22.33937, lng: 114.20028 },
-          { name: 'Chicken Factory (將軍澳廣場)', address: '將軍澳唐德街1號將軍澳廣場', lat: 22.30893, lng: 114.26260 },
-          { name: 'Chicken Factory (九龍灣)', address: '九龍灣啟業道18號啟業商場地下5號舖', lat: 22.32881, lng: 114.20944 },
-          { name: 'Chicken Factory (荃灣)', address: '荃灣楊屋道18號荃新天地2 UG樓UG81號舖', lat: 22.36998, lng: 114.11352 },
-          { name: 'Chicken Factory (大埔)', address: '大埔南運路9號大埔超級城097號舖', lat: 22.45151, lng: 114.17013 },
-          { name: 'Chicken Factory (粉嶺)', address: '粉嶺一鳴路18號華心商場1樓R120-123號舖', lat: 22.48663, lng: 114.14206 },
-          { name: 'Chicken Factory (香港仔)', address: '香港仔南寧街6-12號香港仔中心地下', lat: 22.24848, lng: 114.15416 },
-          { name: 'Chicken Factory (馬鞍山)', address: '馬鞍山西沙路608號馬鞍山廣場', lat: 22.42542, lng: 114.23137 },
-          { name: 'Chicken Factory (觀塘)', address: '觀塘開源道62號駱駝漆大廈3期地下', lat: 22.31011, lng: 114.22652 },
-          { name: 'Chicken Factory (旺角)', address: '旺角亞皆老街8號朗豪坊', lat: 22.31825, lng: 114.16861 },
-          { name: 'Chicken Factory (沙田)', address: '沙田正街18號新城市廣場', lat: 22.38114, lng: 114.18837 },
-          { name: 'Chicken Factory (元朗)', address: '元朗青山公路-元朗段249-251號', lat: 22.44492, lng: 114.02405 },
-          { name: 'Chicken Factory (屯門)', address: '屯門屯隆街3號屯門時代廣場', lat: 22.39290, lng: 113.97733 },
-          { name: 'Chicken Factory (天水圍)', address: '天水圍天恩路12-18號置富嘉湖', lat: 22.45400, lng: 114.00100 },
-          { name: 'Chicken Factory (黃大仙)', address: '黃大仙龍翔道136號黃大仙中心', lat: 22.34221, lng: 114.19222 },
-          { name: 'Chicken Factory (樂富)', address: '樂富橫頭磡南道198號樂富廣場', lat: 22.33787, lng: 114.18631 },
-          { name: 'Chicken Factory (太古)', address: '太古英皇道1111號太古城中心', lat: 22.28611, lng: 114.21682 },
-          { name: 'Chicken Factory (銅鑼灣)', address: '銅鑼灣軒尼詩道500號希慎廣場', lat: 22.27981, lng: 114.18379 },
-          { name: 'Chicken Factory (紅磡)', address: '紅磡馬頭圍道37-39號紅磡商業中心', lat: 22.30707, lng: 114.18677 },
-          { name: 'Chicken Factory (深水埗)', address: '深水埗長沙灣道681號西九龍中心', lat: 22.33111, lng: 114.15980 },
-          { name: 'Chicken Factory (油塘)', address: '油塘鯉魚門道12號大本型', lat: 22.29630, lng: 114.23861 }
-        ]
-      },
-      {
-        brand: '全日雞實驗所 All Day Chicken Lab',
-        categories: ['chicken'],
-        description: '海南雞飯關注組第1名！前君悅酒店廚師主理，招牌溫泉海南雞以低溫慢煮保持粉嫩口感，走皮食用每100g約含25g蛋白質，低脂高蛋白之選。',
-        branches: [
-          { name: '全日雞實驗所 (北角)', address: '北角和富道21-53號和富薈地庫B50-51號舖', lat: 22.29234, lng: 114.19643 },
-          { name: '全日雞實驗所 (旺角)', address: '旺角通菜街80號地下', lat: 22.31917, lng: 114.17071 }
-        ]
-      },
-      {
-        brand: '金雞去骨海南雞專門店',
-        categories: ['chicken'],
-        description: '西貢馳名去骨海南雞，雞肉嫩滑多汁，去骨方便食用。海南雞以水煮製作，低脂高蛋白，每100g雞肉約含25g蛋白質，配油飯同雞湯。',
-        branches: [
-          { name: '金雞去骨海南雞 (西貢)', address: '西貢福民路34號地舖', lat: 22.38161, lng: 114.27408 },
-          { name: '金雞去骨海南雞 (九龍城)', address: '九龍城衙前圍道84號地下B號舖', lat: 22.32906, lng: 114.18973 },
-          { name: '金雞去骨海南雞 (佐敦)', address: '佐敦白加士街85號地舖', lat: 22.30578, lng: 114.17057 },
-          { name: '金雞去骨海南雞 (荃灣)', address: '荃灣昌泰街3-5號富榮大廈地下2號舖', lat: 22.37231, lng: 114.11580 },
-          { name: '金雞去骨海南雞 (北角)', address: '北角英皇道560號健威坊地下L15號舖', lat: 22.29140, lng: 114.20000 }
-        ]
-      },
-      {
-        brand: '勇記海南雞',
-        categories: ['chicken'],
-        description: '前君悅酒店大廚主理，招牌粉嫩滑雞配油飯同椰子雞湯，每日限量供應。雞肉以低溫浸煮保持嫩滑，去皮後低脂高蛋白，健身人士恩物。',
-        branches: [
-          { name: '勇記海南雞 (紅磡)', address: '紅磡馬頭圍道23-35H號隆基大樓地下29L號舖', lat: 22.30688, lng: 114.18674 },
-          { name: '勇記海南雞 (上環)', address: '上環蘇杭街102號江寧大廈地舖', lat: 22.28520, lng: 114.15073 },
-          { name: '勇記海南雞 (觀塘)', address: '觀塘駿業街', lat: 22.30956, lng: 114.22176 }
-        ]
-      },
-      {
-        brand: '泰亞萊海南雞專門店 Thai Appetizing',
-        categories: ['chicken'],
-        description: '泰式海南雞專門店，提供正宗泰式白切雞、油雞等，配特製辣醬。雞肉蛋白質豐富，走皮走醬食用適合控制熱量嘅健身人士。',
-        branches: [
-          { name: '泰亞萊海南雞 (荔枝角)', address: '荔枝角長順街億利工業中心地下6A6號舖', lat: 22.33579, lng: 114.14574 },
-          { name: '泰亞萊海南雞 (新蒲崗)', address: '新蒲崗大有街14號萬星工業大廈地下C2號舖', lat: 22.33838, lng: 114.19877 },
-          { name: '泰亞萊海南雞 (葵涌)', address: '葵涌華星街1-7號美華工業大廈地下C5-C6號舖', lat: 22.36341, lng: 114.13447 },
-          { name: '泰亞萊海南雞 (深水埗)', address: '深水埗福榮街97號地舖', lat: 22.33140, lng: 114.16322 },
-          { name: '泰亞萊海南雞 (紅磡)', address: '紅磡庇利街32號地舖', lat: 22.31212, lng: 114.19085 },
-          { name: '泰亞萊海南雞 (沙田石門)', address: '沙田石門安麗街18號達利廣場地下4號C舖', lat: 22.38879, lng: 114.20779 },
-          { name: '泰亞萊海南雞 (黃大仙)', address: '黃大仙龍翔道136號黃大仙中心北館1樓N141號舖', lat: 22.34221, lng: 114.19222 },
-          { name: '泰亞萊海南雞 (九龍灣)', address: '九龍灣牛頭角道77號淘大商場3期地下G266-270號舖', lat: 22.32715, lng: 114.21344 }
-        ]
-      },
-      {
-        brand: 'Goobne Chicken 굽네치킨',
-        categories: ['chicken', 'healthy'],
-        description: '韓國人氣烤雞品牌，主打「烤」而非「炸」，比傳統炸雞少油脂。招牌火山烤雞以焗爐烤製，保留雞肉蛋白質同時大幅降低脂肪含量。',
-        branches: [
-          { name: 'Goobne Chicken (尖沙咀)', address: '尖沙咀赫德道4號The Hart 2樓', lat: 22.29796, lng: 114.17469 },
-          { name: 'Goobne Chicken (旺角)', address: '旺角彌敦道628號瓊華中心15樓', lat: 22.31790, lng: 114.16948 },
-          { name: 'Goobne Chicken (銅鑼灣)', address: '銅鑼灣登龍街18號V Point 25樓', lat: 22.27906, lng: 114.18156 },
-          { name: 'Goobne Chicken (中環)', address: '中環威靈頓街2-8號威靈頓廣場M88 5樓', lat: 22.28076, lng: 114.15602 },
-          { name: 'Goobne Chicken (荃灣)', address: '荃灣楊屋道1號荃新天地一期地下G29號舖', lat: 22.36998, lng: 114.11352 },
-          { name: 'Goobne Chicken (將軍澳)', address: '將軍澳唐賢街19號天晉匯II期1樓119A號舖', lat: 22.30255, lng: 114.25851 },
-          { name: 'Goobne Chicken (東涌)', address: '東涌達東路20號東薈城2期7樓701號舖', lat: 22.28992, lng: 113.93982 }
-        ]
-      },
-      {
-        brand: 'Green Common',
-        categories: ['healthy'],
-        description: '全港最大素食連鎖餐廳，提供植物肉、素食漢堡等高蛋白植物性飲食。適合想減少動物脂肪攝取嘅健身人士，蛋白質來源多元化。',
-        branches: [
-          { name: 'Green Common (尖沙咀)', address: '尖沙咀彌敦道132號美麗華商場B1', lat: 22.30088, lng: 114.17258 },
-          { name: 'Green Common (銅鑼灣)', address: '銅鑼灣勿地臣街1號時代廣場B2', lat: 22.27836, lng: 114.18211 },
-          { name: 'Green Common (九龍塘)', address: '九龍塘達之路80號又一城LG2', lat: 22.33688, lng: 114.17551 },
-          { name: 'Green Common (沙田)', address: '沙田正街18號新城市廣場一期3樓', lat: 22.38114, lng: 114.18837 },
-          { name: 'Green Common (將軍澳)', address: '將軍澳唐德街9號將軍澳中心', lat: 22.30949, lng: 114.26164 },
-          { name: 'Green Common (旺角)', address: '旺角亞皆老街8號朗豪坊', lat: 22.31825, lng: 114.16861 }
-        ]
-      },
-      {
-        brand: '淺草炸雞 KARAYAMA',
-        categories: ['chicken'],
-        description: '日式炸雞專門店，招牌炸雞定食份量十足。雖然係炸雞但蛋白質含量高，建議配沙律代替白飯，控制碳水攝取同時補充蛋白質。',
-        branches: [
-          { name: '淺草炸雞 KARAYAMA (新蒲崗)', address: '新蒲崗四美街8號百匯中心地下', lat: 22.33705, lng: 114.20105 },
-          { name: '淺草炸雞 KARAYAMA (觀塘)', address: '觀塘成業街10號電訊一代廣場', lat: 22.31011, lng: 114.22652 }
-        ]
-      }
-    ];
+    // 手動整理嘅連鎖店資料，由 data/curated-chains.json 載入（見 loadCuratedChains）
+    let CURATED_CHAINS = [];
+    let curatedLoadFailed = false;
 
     // ============================================================
     // CATEGORIES
@@ -1047,12 +938,16 @@
       },
       protein: {
         label: '高蛋白', cls: 'protein',
-        cuisines: [],
+        cuisines: ['chicken', 'rotisserie', 'poke', 'steak_house', 'bbq'],
         namePatterns: [
           '蛋白', 'protein', '健身', 'fitness', 'meal prep',
           '增肌', 'gym', 'gains', 'macro', '減脂',
-          'muscle', 'fitfood', 'clean food', 'bodybuilding'
-        ]
+          'muscle', 'fitfood', 'clean food', 'bodybuilding',
+          '雞胸', 'chicken breast', '低脂', '高蛋白', '輕卡',
+          'lean', 'nutrition', 'body fit', 'fit food', 'workout',
+          '水煮', '舒肥', 'sous vide', 'grill', '烤雞', '燒雞'
+        ],
+        excludePatterns: ['蛋白酥', '蛋白撻', '蛋撻']
       },
       healthy: {
         label: '健康', cls: 'healthy',
@@ -1143,7 +1038,26 @@
       }).addTo(map);
 
       initBottomSheet();
-      useGPS();
+      // 先載入手動整理嘅連鎖店資料，載完（或失敗）先開始定位搜尋
+      loadCuratedChains().finally(() => useGPS());
+    }
+
+    // ============================================================
+    // CURATED DATA LOADING
+    // ============================================================
+    async function loadCuratedChains() {
+      try {
+        const res = await fetch('data/curated-chains.json', { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('格式唔啱：預期係陣列');
+        CURATED_CHAINS = data;
+        curatedLoadFailed = false;
+      } catch (err) {
+        console.error('載入 curated-chains.json 失敗:', err);
+        CURATED_CHAINS = [];
+        curatedLoadFailed = true;
+      }
     }
 
     // ============================================================
@@ -1292,6 +1206,28 @@
       }
     }
 
+    // 有同源 proxy（server.js / serve.mjs 提供）就行 proxy，冇就直接打 Nominatim
+    async function geocode(query) {
+      const params = new URLSearchParams({
+        q: query, format: 'json', limit: '5', addressdetails: '1'
+      });
+
+      try {
+        const res = await fetch(`api/search?${params}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) return data;
+        }
+      } catch {
+        // 冇 proxy（例如直接開檔案），跌落去打公共服務
+      }
+
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      return res.json();
+    }
+
     async function searchLocation() {
       const input = document.getElementById('locationInput').value.trim();
       if (!input) return;
@@ -1300,8 +1236,7 @@
       document.getElementById('loadingOverlay').classList.remove('hidden');
 
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(input + ' 香港')}&format=json&limit=5&addressdetails=1`, { headers: { 'Accept': 'application/json' } });
-        const data = await res.json();
+        const data = await geocode(input + ' 香港');
 
         if (data.length > 0) {
           const result = data[0];
@@ -1348,28 +1283,61 @@
     // ============================================================
     // OVERPASS FETCH WITH RETRY
     // ============================================================
+    // 同源 proxy（由 server.js 提供）行先，冇 proxy 就直接打公共 server
+    const OVERPASS_PROXY = 'api/overpass';
     const OVERPASS_SERVERS = [
       'https://overpass-api.de/api/interpreter',
       'https://overpass.kumi.systems/api/interpreter'
     ];
+    const OVERPASS_TIMEOUT_MS = 20000;
 
+    // 打一次某個 endpoint。失敗一律 throw，方便上面用 Promise.any 競速。
+    async function fetchOverpassOnce(endpoint, query) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), OVERPASS_TIMEOUT_MS);
+
+      let res;
+      try {
+        res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+
+      if (!res.ok) throw new Error(`${endpoint} → HTTP ${res.status}`);
+
+      const text = await res.text();
+      // 過載／出錯時 Overpass 會回 HTML 或者 XML 錯誤頁，唔係 JSON
+      if (text.startsWith('<')) throw new Error(`${endpoint} → 回咗錯誤頁而唔係 JSON`);
+
+      return { ok: true, elements: JSON.parse(text).elements || [] };
+    }
+
+    // 回傳 { ok, elements }。ok=false 代表所有 server 都撻咗，
+    // 同「附近真係冇店」係兩件事，唔可以當成空結果處理。
     async function fetchOverpass(query) {
-      for (const server of OVERPASS_SERVERS) {
-        for (let attempt = 0; attempt < 2; attempt++) {
-          try {
-            if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
-            const res = await fetch(server, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: `data=${encodeURIComponent(query)}`
-            });
-            const text = await res.text();
-            if (text.startsWith('<') || text.startsWith('<?xml')) continue;
-            return JSON.parse(text);
-          } catch { continue; }
+      let lastError = null;
+      // 同源 proxy 同公共 server 一齊打，邊個先返就用邊個。
+      // 排隊逐個等 timeout 太慢，而且 proxy 唔存在（直接開檔案）或者
+      // server 端出唔到街嘅時候，都唔會拖慢前端。
+      const endpoints = [OVERPASS_PROXY, ...OVERPASS_SERVERS];
+
+      for (let round = 0; round < 2; round++) {
+        if (round > 0) await new Promise(r => setTimeout(r, 2000));
+        try {
+          return await Promise.any(endpoints.map(s => fetchOverpassOnce(s, query)));
+        } catch (err) {
+          // AggregateError：攞最後一個真實原因出嚟報
+          lastError = err?.errors?.[err.errors.length - 1] || err;
         }
       }
-      return { elements: [] };
+
+      console.error('Overpass 全部 server 都失敗:', lastError);
+      return { ok: false, elements: [], error: lastError };
     }
 
     // ============================================================
@@ -1384,13 +1352,13 @@
       const query = `[out:json][timeout:25];(node["amenity"~"restaurant|fast_food|cafe|food_court"](around:${radius},${lat},${lng});way["amenity"~"restaurant|fast_food|cafe|food_court"](around:${radius},${lat},${lng});node["shop"~"deli|health_food|butcher"](around:${radius},${lat},${lng}););out center tags;`;
 
       try {
-        const data = await fetchOverpass(query);
+        const result = await fetchOverpass(query);
 
         const seenNames = new Set();
         allPlaces = [];
 
-        if (data.elements) {
-          for (const el of data.elements) {
+        {
+          for (const el of result.elements) {
             const pLat = el.lat || el.center?.lat;
             const pLng = el.lon || el.center?.lon;
             if (!pLat || !pLng) continue;
@@ -1454,16 +1422,58 @@
 
         allPlaces.sort((a, b) => a.distance - b.distance);
         renderResults();
+
+        // 分清楚「地圖資料撻咗」同「附近真係冇店」
+        if (!result.ok || curatedLoadFailed) {
+          showDataWarning({
+            overpassFailed: !result.ok,
+            curatedFailed: curatedLoadFailed,
+            hasResults: allPlaces.length > 0
+          });
+        }
       } catch (err) {
         console.error('Search error:', err);
-        document.getElementById('resultsList').innerHTML = `
-          <div class="empty-state">
-            <div class="icon">&#x26A0;&#xFE0F;</div>
-            <p>搜尋失敗，請稍後再試</p>
-          </div>`;
+        showDataWarning({ overpassFailed: true, curatedFailed: curatedLoadFailed, hasResults: false });
       }
 
       document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    // 資料源出事時嘅提示 —— 重點係唔好令用戶以為「附近真係冇健康餐廳」
+    function showDataWarning({ overpassFailed, curatedFailed, hasResults }) {
+      const list = document.getElementById('resultsList');
+      if (!list) return;
+
+      const reasons = [];
+      if (overpassFailed) reasons.push('地圖資料服務（Overpass）暫時連唔到');
+      if (curatedFailed) reasons.push('本地店舖名單載入失敗');
+      const reasonText = reasons.join('；');
+
+      const btnStyle = 'margin-top:12px;padding:8px 18px;border:none;border-radius:999px;' +
+        'background:#e8763a;color:#fff;font-size:14px;font-weight:600;cursor:pointer;';
+
+      if (!hasResults) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">&#x26A0;&#xFE0F;</div>
+            <p>搜尋失敗，唔係附近冇店<br>
+              <span style="opacity:.65;font-size:13px">${reasonText}</span></p>
+            <button type="button" id="retrySearchBtn" style="${btnStyle}">再試一次</button>
+          </div>`;
+        document.getElementById('retrySearchBtn')?.addEventListener('click', () => searchNearby());
+        return;
+      }
+
+      // 有結果就唔好蓋住個列表，喺頂部插一條提示就算
+      document.getElementById('dataWarningBanner')?.remove();
+      const banner = document.createElement('div');
+      banner.id = 'dataWarningBanner';
+      banner.style.cssText = 'margin:8px 12px;padding:10px 12px;border-radius:12px;' +
+        'background:rgba(232,118,58,.12);color:#c25a20;font-size:13px;line-height:1.5;';
+      banner.innerHTML = `&#x26A0;&#xFE0F; ${reasonText}，下面嘅結果可能唔齊全。
+        <button type="button" id="retrySearchBtn" style="${btnStyle}margin-top:8px;padding:6px 14px;font-size:13px;">重新搜尋</button>`;
+      list.prepend(banner);
+      document.getElementById('retrySearchBtn')?.addEventListener('click', () => searchNearby());
     }
 
     function isBlacklisted(name, tags) {

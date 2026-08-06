@@ -1,3 +1,6 @@
 node_modules/
 .env
 .DS_Store
+
+# iCloud 抽走咗本體、讀唔到嘅舊 .git
+.git.icloud-dataless/
