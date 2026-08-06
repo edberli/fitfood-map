@@ -373,6 +373,14 @@
     .mini-tag.protein { background: rgba(104,88,160,0.1); color: var(--tag-protein); }
     .mini-tag.healthy { background: rgba(90,142,93,0.1); color: var(--tag-healthy); }
     .mini-tag.salad { background: rgba(74,127,127,0.1); color: var(--tag-salad); }
+    /* 「可以食得健康」係推測，唔係明確分類，所以刻意淡啲 */
+    .mini-tag.maybe { background: rgba(0,0,0,0.04); color: rgba(0,0,0,0.42); font-weight: 500; }
+
+    .panel-radius {
+      font-size: 11px;
+      color: rgba(0,0,0,0.4);
+      letter-spacing: 0.2px;
+    }
 
     .card-nav {
       width: 32px; height: 32px;
@@ -853,6 +861,7 @@
       <div style="display:flex;align-items:center;gap:10px">
         <span class="panel-title">附近餐廳</span>
         <span class="panel-count" id="resultCount">0</span>
+        <span class="panel-radius" id="resultRadius"></span>
       </div>
       <button class="panel-close" onclick="togglePanel(false)">&#x2715;</button>
     </div>
@@ -900,6 +909,13 @@
     let allPlaces = [];
     let userPos = null;
     let currentFilter = 'all';
+    let currentRadius = 800;
+
+    // Overpass 一次過攞晒 3km，之後喺前端逐層收窄 —— 唔使為咗擴大範圍再打多次 API。
+    // 預設由 800m（約 10 分鐘步程）起，夠 MIN_RESULTS 間就唔擴大。
+    const SEARCH_MAX_RADIUS = 3000;
+    const RADIUS_STEPS = [800, 1500, 3000];
+    const MIN_RESULTS = 8;
     let panelOpen = false;
     let isMobile = window.innerWidth <= 768;
 
@@ -962,6 +978,29 @@
         label: '沙律', cls: 'salad',
         cuisines: ['salad', 'poke'],
         namePatterns: ['沙律', 'salad', 'poke', 'açaí', 'acai']
+      },
+      // 中間層：唔係主打健康，但揀得啱一樣食得健康（蒸、灼、烤、湯、生魚片之類）。
+      // soft:true 代表只喺完全冇明確分類時先當佢中伏，卡片上會用淡色標籤區分。
+      maybe: {
+        label: '可健康', cls: 'maybe', soft: true,
+        cuisines: [
+          'japanese', 'sushi', 'korean', 'barbecue', 'bbq', 'vietnamese',
+          'thai', 'congee', 'soup', 'seafood', 'steak_house', 'sandwich',
+          'dim_sum', 'mediterranean', 'greek', 'hotpot', 'fish'
+        ],
+        namePatterns: [
+          '粥', '蒸', '灼', '滷味', '燉', '老火湯', '海鮮', '魚',
+          '壽司', '刺身', '丼', '定食', '日本料理', '日式', '和食',
+          '韓國', '韓式', '燒肉', '烤肉', '越南', '河粉', '泰式', '冬蔭',
+          '三文治', 'sandwich', 'wrap', 'poke', '點心', '火鍋', '打邊爐',
+          'sushi', 'sashimi', 'donburi', 'teishoku', 'pho', 'banh mi',
+          'steak', 'grill', 'seafood', 'congee', 'soup'
+        ],
+        // 呢啲雖然撞到上面嘅字，但同健康完全掛唔到鉤
+        excludePatterns: [
+          '炸', '天婦羅', 'tempura', '拉麵', 'ramen', '燒賣', '蛋糕',
+          '甜品', 'dessert', '雪糕', '奶茶', '珍珠'
+        ]
       }
     };
 
@@ -1012,11 +1051,30 @@
     // ============================================================
     // CATEGORY ICON
     // ============================================================
-    function getCatIcon(categories) {
+    // 「可健康」嗰類靠 cuisine 分圖示，唔好成條列表都係同一個灰餐具
+    const MAYBE_ICONS = [
+      [['sushi', 'japanese'], '&#x1F363;'],
+      [['korean', 'barbecue', 'bbq', 'steak_house'], '&#x1F356;'],
+      [['vietnamese', 'pho'], '&#x1F35C;'],
+      [['thai'], '&#x1F336;'],
+      [['congee', 'soup', 'hotpot'], '&#x1F372;'],
+      [['seafood', 'fish'], '&#x1F41F;'],
+      [['sandwich'], '&#x1F96A;'],
+      [['dim_sum'], '&#x1F95F;']
+    ];
+
+    function getCatIcon(categories, cuisine = '') {
       if (categories.has('chicken')) return '&#x1F357;';
       if (categories.has('salad')) return '&#x1F957;';
       if (categories.has('protein')) return '&#x1F4AA;';
       if (categories.has('healthy')) return '&#x1F96C;';
+
+      if (categories.has('maybe') && cuisine) {
+        const c = cuisine.toLowerCase();
+        for (const [keys, icon] of MAYBE_ICONS) {
+          if (keys.some(k => c.includes(k))) return icon;
+        }
+      }
       return '&#x1F37D;';
     }
 
@@ -1188,7 +1246,9 @@
           <div class="icon">&#x1F4CD;</div>
           <p>未能取得你嘅位置<br><br>請喺上方搜尋欄輸入地址<br>例如：觀塘、旺角、銅鑼灣</p>
         </div>`;
-      document.getElementById('resultCount').textContent = '0';
+      document.getElementById('resultCount').textContent = '0 間';
+      const radiusEl = document.getElementById('resultRadius');
+      if (radiusEl) radiusEl.textContent = '';
     }
 
     async function reverseGeocode(lat, lng) {
@@ -1346,7 +1406,7 @@
     async function searchNearby() {
       document.getElementById('loadingOverlay').classList.remove('hidden');
 
-      const radius = 3000;
+      const radius = SEARCH_MAX_RADIUS;
       const { lat, lng } = userPos;
 
       const query = `[out:json][timeout:25];(node["amenity"~"restaurant|fast_food|cafe|food_court"](around:${radius},${lat},${lng});way["amenity"~"restaurant|fast_food|cafe|food_court"](around:${radius},${lat},${lng});node["shop"~"deli|health_food|butcher"](around:${radius},${lat},${lng}););out center tags;`;
@@ -1354,7 +1414,6 @@
       try {
         const result = await fetchOverpass(query);
 
-        const seenNames = new Set();
         allPlaces = [];
 
         {
@@ -1389,16 +1448,21 @@
             };
             place.description = generateDescription(place);
             allPlaces.push(place);
-            seenNames.add(name.toLowerCase());
           }
         }
 
         // Add curated chains
+        // 喺加 curated 之前先影低 OSM 嗰批，去重只可以同 OSM 比，
+        // 唔可以同已加入嘅 curated 比 —— 否則同品牌其他分店會互相殺死。
+        const osmPlaces = [...allPlaces];
+
         for (const chain of CURATED_CHAINS) {
           for (const branch of chain.branches) {
-            if (seenNames.has(branch.name.toLowerCase())) continue;
             const dist = calcDistance(userPos, { lat: branch.lat, lng: branch.lng });
-            if (dist > 3) continue;
+            if (dist * 1000 > SEARCH_MAX_RADIUS) continue;
+            // OSM 嗰邊叫「Chicken Factory」，curated 叫「Chicken Factory (太古)」，
+            // 同一間店會出現兩次 —— 名夾位置都夠近先當重複
+            if (isSameShopAsOSM(branch, osmPlaces)) continue;
 
             const cats = new Set(chain.categories);
             const place = {
@@ -1416,7 +1480,6 @@
             };
             place.description = chain.description;
             allPlaces.push(place);
-            seenNames.add(branch.name.toLowerCase());
           }
         }
 
@@ -1476,6 +1539,31 @@
       document.getElementById('retrySearchBtn')?.addEventListener('click', () => searchNearby());
     }
 
+    // 去掉分店括號、空格、標點，淨返可以比對嘅核心店名
+    function normalizeName(name) {
+      return name.toLowerCase()
+        .replace(/[（(][^)）]*[)）]/g, '')
+        .replace(/[^a-z0-9一-鿿]/g, '');
+    }
+
+    // 判斷 curated 分店係咪同 OSM 嗰間係同一間舖。
+    // 一定要連位置一齊睇：淨係比名嘅話，「Chicken Factory (觀塘)」同
+    // 「Chicken Factory (九龍灣)」剝走括號之後會變成同一個 key，成個品牌淨返一間。
+    const SAME_SHOP_MAX_DISTANCE_KM = 0.5;
+
+    function isSameShopAsOSM(branch, osmPlaces) {
+      const key = normalizeName(branch.name);
+      if (key.length < 4) return false;
+
+      return osmPlaces.some(p => {
+        const s = normalizeName(p.name);
+        if (s.length < 4) return false;
+        if (!(s === key || s.startsWith(key) || key.startsWith(s))) return false;
+        // curated 好多時記錄商場座標，OSM 記錄實際舖位，兩者可以差幾百米
+        return calcDistance({ lat: branch.lat, lng: branch.lng }, p) <= SAME_SHOP_MAX_DISTANCE_KM;
+      });
+    }
+
     function isBlacklisted(name, tags) {
       const check = (name + ' ' + (tags['name:en'] || '') + ' ' + (tags.brand || '') + ' ' + (tags['brand:en'] || '')).toLowerCase();
       return BLACKLIST.some(b => check.includes(b));
@@ -1487,6 +1575,7 @@
       const allText = nameLower + ' ' + cuisine;
 
       for (const [catKey, cat] of Object.entries(CATEGORIES)) {
+        if (cat.soft) continue;   // 中間層留返最後先判斷
         let matched = false;
 
         for (const c of cat.cuisines) {
@@ -1508,6 +1597,20 @@
       if (tags['diet:vegetarian'] === 'yes' || tags['diet:vegan'] === 'yes' ||
           tags['diet:healthy'] === 'yes' || tags.organic === 'yes') {
         cats.add('healthy');
+      }
+
+      // 完全撞唔到明確分類，先睇下係咪「揀得啱一樣食得健康」嗰類。
+      // 唔咁做嘅話 95% 附近餐廳會被剷走，剩返嘅結果疏到要拉 3km 先夠數。
+      if (cats.size === 0) {
+        for (const [catKey, cat] of Object.entries(CATEGORIES)) {
+          if (!cat.soft) continue;
+
+          const hit = cat.cuisines.some(c => cuisine.includes(c)) ||
+                      cat.namePatterns.some(p => allText.includes(p.toLowerCase()));
+          const blocked = cat.excludePatterns?.some(ep => allText.includes(ep.toLowerCase()));
+
+          if (hit && !blocked) cats.add(catKey);
+        }
       }
 
       return cats;
@@ -1552,8 +1655,25 @@
     }
 
     function getFilteredPlaces() {
-      if (currentFilter === 'all') return allPlaces;
-      return allPlaces.filter(p => p.categories.has(currentFilter));
+      const matching = currentFilter === 'all'
+        ? allPlaces
+        : allPlaces.filter(p => p.categories.has(currentFilter));
+
+      // 每個篩選各自揀合適半徑：例如「沙律」800m 內冇，就自動放到 1.5km
+      currentRadius = pickRadius(matching);
+      return matching.filter(p => p.distance * 1000 <= currentRadius);
+    }
+
+    // 由最細一層開始，夠數就唔再擴大
+    function pickRadius(places) {
+      for (const r of RADIUS_STEPS) {
+        if (places.filter(p => p.distance * 1000 <= r).length >= MIN_RESULTS) return r;
+      }
+      return RADIUS_STEPS[RADIUS_STEPS.length - 1];
+    }
+
+    function formatRadius(m) {
+      return m < 1000 ? `${m}m 內` : `${(m / 1000).toFixed(m % 1000 ? 1 : 0)}km 內`;
     }
 
     // ============================================================
@@ -1566,9 +1686,12 @@
       const places = getFilteredPlaces();
       const list = document.getElementById('resultsList');
       const countEl = document.getElementById('resultCount');
+      const radiusEl = document.getElementById('resultRadius');
       const badge = document.getElementById('toggleBadge');
 
       countEl.textContent = `${places.length} 間`;
+      // 講明而家搵緊幾遠，唔好等用戶自己估
+      if (radiusEl) radiusEl.textContent = formatRadius(currentRadius);
       if (badge) {
         badge.textContent = places.length;
         badge.style.display = places.length > 0 ? '' : 'none';
@@ -1578,7 +1701,7 @@
         list.innerHTML = `
           <div class="empty-state">
             <div class="icon">&#x1F937;</div>
-            <p>附近搵唔到相關餐廳<br>試吓轉其他篩選條件</p>
+            <p>${formatRadius(currentRadius)}搵唔到相關餐廳<br>試吓轉其他篩選條件</p>
           </div>`;
         return;
       }
@@ -1624,7 +1747,7 @@
         }
 
         card.innerHTML = `
-          <div class="card-icon">${getCatIcon(place.categories)}</div>
+          <div class="card-icon">${getCatIcon(place.categories, place.cuisine)}</div>
           <div class="card-body">
             <div class="card-name">${place.name}</div>
             <div class="card-meta">
