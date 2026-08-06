@@ -5,5 +5,3 @@ node_modules/
 # iCloud 抽走咗本體、讀唔到嘅舊 .git
 .git.icloud-dataless/
 
-# 用 GitHub Pages 嘅 branch build，唔再用 workflow 部署
-.github/workflows/pages.yml
