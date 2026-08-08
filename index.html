@@ -555,7 +555,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08e';
+    const BUILD = '2026-08-08f';
 
     // ============================================================
     // STATE
@@ -1377,9 +1377,13 @@
           allPlaces.push(place);
         }
 
-        // ② OSM 街坊餐廳（補充，預設唔顯示）
+        // ② OSM 入面「雞肉／無肉 + 最健康」嗰批（雞飯、手撕雞、海南雞、素食、沙律）
+        //    本身就係健身人士要搵嘅嘢，之前被埋喺補充層預設睇唔到 —— 提升做預設顯示。
+        //    其餘 OSM 記錄仍然要撳「連埋街坊餐廳」先出。
         const fitKeys = new Set(allPlaces.map(p => p.name.toLowerCase().replace(/\W/g, '')));
-        for (let i = 0; includeOsm && i < LOCAL_PLACES.length; i++) {
+        const OSM_FIT = (r) => r.s === 'best' && (r.m === 'chicken' || r.m === 'none');
+        for (let i = 0; i < LOCAL_PLACES.length; i++) {
+          if (!includeOsm && !OSM_FIT(LOCAL_PLACES[i])) continue;
           const r = LOCAL_PLACES[i];
           const distance = calcDistance(userPos, { lat: r.a, lng: r.o });
           if (distance * 1000 > SEARCH_MAX_RADIUS) continue;
