@@ -24,7 +24,7 @@ node serve.mjs 3001
 | `index.html` | 主檔。HTML + CSS + JS 全部喺入面，Leaflet 由 CDN 載 |
 | `data/hk-places.json` | **全港 6,347 間食肆快照**（912 KB），前端唯一 POI 來源 |
 | `data/name-classes.json` | 4,219 個店名 → 兩軸分類對照表 |
-| `data/curated-chains.json` | 手動整理嘅連鎖店名單（8 個品牌、54 間分店），補 OSM 冇嘅健身連鎖 |
+| `data/curated-chains.json` | **已停用**，見下面「人手名單點解停用」 |
 | `data/stock-photos.json` | 示意圖名單（Wikimedia Commons），連授權同作者 |
 | `server.js` | Express server，帶 `/api/overpass`、`/api/search`、`/api/reverse` proxy |
 | `serve.mjs` | 零依賴 Node server，功能同上 |
@@ -85,6 +85,18 @@ Overpass 只喺重建嗰陣用，運行時完全唔會打。`server.js` 仲保�
 - **一直見到嘅位置狀態列** —— 以前只有個會自動消失嘅 toast，用戶根本唔知而家搵緊邊度、個位置邊度嚟。而家有條長駐嘅 bar，粗體寫住地名，旁邊寫住來源（GPS 定位／你搜尋嘅地點／上次用過／地圖範圍／系統預設）同誤差，右邊有「用我嘅位置」掣
 - **香港邊界檢查** —— 定位結果跌出香港範圍（VPN、IP 定位、網絡定位出錯）就唔採用，明講「定位結果喺香港以外」。呢個係桌面機「定位錯」最常見嘅成因
 - **系統退路唔會被記住** —— 退去預設地區嗰陣唔會寫入 `localStorage`。以前會，結果之後每次開頁都靜靜哋跳返嗰區，睇落就係「定位成日都錯」
+
+## 人手名單點解停用
+
+`data/curated-chains.json` 有 8 個品牌、54 間分店，全部人手打。已經**唔再載入**。
+
+點解：
+
+- 54 間入面，只有 **8 間**喺 OSM 搵到對應（同名 + 500m 內）。其餘 46 間冇任何第二個來源證實。
+- 抽查「Chicken Factory (紅磡)」，對返 [OpenRice 官方分店表](https://www.openrice.com/en/hongkong/restaurants?chainId=10006114&chainName=Chicken%20Factory)：**根本冇紅磡分店**。屯門、深水埗、太古幾間嘅商場名亦同官方對唔上。
+- 一間唔存在嘅店，比冇資料仲差 —— 用戶行過去先發現冇，就唔會再信成個 app。
+
+要重新啟用嘅話，要逐間對返品牌官網或者 OpenRice 核實，唔可以再靠人手記憶打。
 
 ## 「附近」點計
 

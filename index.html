@@ -535,7 +535,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08b';
+    const BUILD = '2026-08-08c';
 
     // ============================================================
     // STATE
@@ -854,8 +854,11 @@
       buildDistricts();
 
       // 資料載完（或失敗）先開始定位
+      // data/curated-chains.json 已經停用 —— 54 間人手打嘅分店，得 8 間喺 OSM 有對應，
+      // 而「Chicken Factory (紅磡)」經 OpenRice 官方分店表核實根本唔存在。
+      // 作出嚟嘅店比冇資料仲差，所以唔再載入。要重新啟用就要逐間核實過先。
       Promise.all([
-        loadLocalPlaces(), loadCuratedChains(), loadStockPhotos(), loadNameClasses()
+        loadLocalPlaces(), loadStockPhotos(), loadNameClasses()
       ]).finally(startLocating);
     }
 
@@ -1398,29 +1401,24 @@
         renderResults();
 
         // 分清楚「資料載唔到」同「附近真係冇店」
-        if (localLoadFailed || curatedLoadFailed) {
-          showDataWarning({
-            localFailed: localLoadFailed,
-            curatedFailed: curatedLoadFailed,
-            hasResults: allPlaces.length > 0
-          });
+        if (localLoadFailed) {
+          showDataWarning({ localFailed: true, hasResults: allPlaces.length > 0 });
         }
       } catch (err) {
         console.error('Search error:', err);
-        showDataWarning({ localFailed: true, curatedFailed: curatedLoadFailed, hasResults: false });
+        showDataWarning({ localFailed: true, hasResults: false });
       }
 
       document.getElementById('loadingOverlay').classList.add('hidden');
     }
 
     // 資料源出事時嘅提示 —— 重點係唔好令用戶以為「附近真係冇健康餐廳」
-    function showDataWarning({ localFailed, curatedFailed, hasResults }) {
+    function showDataWarning({ localFailed, hasResults }) {
       const list = document.getElementById('resultsList');
       if (!list) return;
 
       const reasons = [];
       if (localFailed) reasons.push('全港餐廳資料集（data/hk-places.json）載唔到');
-      if (curatedFailed) reasons.push('本地店舖名單載入失敗');
       const reasonText = reasons.join('；');
 
       if (!hasResults) {
