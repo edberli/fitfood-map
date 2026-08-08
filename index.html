@@ -504,7 +504,7 @@
       </div>
     </div>
     <div class="legal">
-      <div>© 2026 FitFood Map · 地圖資料 © OpenStreetMap contributors</div>
+      <div>© 2026 FitFood Map · 地圖資料 © OpenStreetMap contributors · 版本 <b id="buildStamp"></b></div>
       <div>繁體中文 (HK) · 香港</div>
     </div>
   </div>
@@ -534,6 +534,9 @@
 </div>
 
   <script>
+    // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
+    const BUILD = '2026-08-08b';
+
     // ============================================================
     // STATE
     // ============================================================
@@ -845,6 +848,8 @@
       setTimeout(() => map.invalidateSize(), 0);
       window.addEventListener('resize', () => map.invalidateSize());
 
+      const stamp = document.getElementById('buildStamp');
+      if (stamp) stamp.textContent = BUILD;
       buildChips();
       buildDistricts();
 
