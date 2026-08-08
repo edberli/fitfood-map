@@ -708,11 +708,18 @@
     // ============================================================
     // GOOGLE MAPS URL
     // ============================================================
+    // 導航連結一定要用座標。
+    // 以前送店名＋地址畀 Google 自己搵，Google 會喺全港同名分店入面自己揀一間 ——
+    // 卡片寫住「Chicken Factory (紅磡)」，撳落去去咗鑽石山嗰間。連鎖店必中。
     function getMapsUrl(place) {
-      const destination = place.address
-        ? `${place.name}, ${place.address}`
-        : place.name;
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
+      return `https://www.google.com/maps/search/?api=1&query=${place.lat}%2C${place.lng}`;
+    }
+
+    // 想睇間店嘅 Google 資料（相、評分、營業時間）先用名搵，
+    // 但要夾住座標做視窗中心，唔好由得 Google 喺全港亂搵。
+    function getMapsLookupUrl(place) {
+      const q = encodeURIComponent(place.name);
+      return `https://www.google.com/maps/search/${q}/@${place.lat},${place.lng},18z`;
     }
 
     // ============================================================
@@ -1880,9 +1887,7 @@
       document.getElementById('detailTags').innerHTML = axisTags(place);
 
       const mapsUrl = getMapsUrl(place);
-      const osmUrl = String(place.id).startsWith('cur_') || String(place.id).startsWith('nom_')
-        ? getMapsUrl(place)
-        : `https://www.openstreetmap.org/node/${place.id}`;
+      const lookupUrl = getMapsLookupUrl(place);
 
       let hoursHTML = '';
       if (place.openingHours) {
@@ -1896,6 +1901,9 @@
       if (place.website) infoRows += `<div class="info-row"><span class="info-label">網站</span><span class="info-value"><a href="${place.website}" target="_blank" rel="noopener">查看</a></span></div>`;
       if (place.cuisine) infoRows += `<div class="info-row"><span class="info-label">菜式</span><span class="info-value">${place.cuisine}</span></div>`;
       infoRows += `<div class="info-row"><span class="info-label">距離</span><span class="info-value">${formatDistance(place.distance)}</span></div>`;
+      // 座標攤出嚟，畀你自己核對個位啱唔啱 —— 唔好淨係叫你信
+      infoRows += `<div class="info-row"><span class="info-label">座標</span><span class="info-value">` +
+        `<a href="${mapsUrl}" target="_blank" rel="noopener">${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}</a></span></div>`;
 
       const photo = placePhoto(place);
       const photoHTML = photo
@@ -1911,8 +1919,10 @@
         <div class="detail-info-grid">${infoRows}</div>
         ${hoursHTML}
         <div class="detail-actions">
-          <a class="btn-primary" href="${mapsUrl}" target="_blank" rel="noopener">Google Maps 導航</a>
-          ${place.phone ? `<a class="btn-outline" href="tel:${place.phone}">致電餐廳</a>` : `<a class="btn-outline" href="${osmUrl}" target="_blank" rel="noopener">查看地圖</a>`}
+          <a class="btn-primary" href="${mapsUrl}" target="_blank" rel="noopener">導航去呢個位</a>
+          ${place.phone
+            ? `<a class="btn-outline" href="tel:${place.phone}">致電餐廳</a>`
+            : `<a class="btn-outline" href="${lookupUrl}" target="_blank" rel="noopener">Google 搵呢間店</a>`}
         </div>
       `;
 
