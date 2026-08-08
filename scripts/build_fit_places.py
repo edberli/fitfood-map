@@ -102,6 +102,12 @@ def main():
             district, name, addr, cat = parts[0], parts[1], parts[2], parts[3].lower()
             why = parts[4] if len(parts) > 4 else ''
             src = parts[5] if len(parts) > 5 else ''
+            # 地址太籠統（例如淨係「港島」「中環」）唔可以入 —— 地理編碼會落錯位。
+            # 實測 Root Vegan 只寫「港島」，結果落咗去淺水灣。要有街道或者門牌先算數。
+            if not re.search(r'[街道路里巷徑坊里村]|\d+號|Street|Road|Avenue', addr):
+                print(f'  地址太籠統，剔走：{name}（{addr}）', file=sys.stderr)
+                continue
+
             key = (re.sub(r'\W', '', name.lower()), district)
             if key in seen:
                 continue
