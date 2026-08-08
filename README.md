@@ -43,11 +43,24 @@ node serve.mjs 3001
 | 搜尋 | 純前端距離計算，**唔使網絡、唔會 timeout** |
 | 新鮮度 | 快照，畫面會寫住「資料截至 YYYY-MM-DD」 |
 
-重建（Overpass 抓 → 分類 → 出檔）：
+重建（Overpass 抓 → 分類 → 洗數據 → 出檔）：
 
 ```bash
-python3 /Volumes/core/fitfood-data/build_dataset.py
+python3 scripts/clean_dataset.py
 ```
+
+洗數據做四件事：
+
+| 步驟 | 實際結果 |
+|---|---|
+| 剷走明確結業（`disused:` / `was:` / `abandoned:` 前綴、`opening_hours=closed`） | −27 |
+| 剷走 OSM 重複記錄（同名 + 40m 內，留資料多嗰筆） | −23 |
+| 標記「資料極薄」（冇地址／電話／網站／營業時間） | 2,873（45%） |
+| 標記「6 年冇人更新」（用 OSM 最後編輯時間） | 981（15%） |
+
+留低 6,297 間。「6 年冇更新」嗰批**預設隱藏**（篩選列有掣可以顯示返）—— OSM 係義工測繪，冇結業標記，好耐冇人掂過嘅記錄好可能已經執咗笠。行到過去先發現冇，比少見幾間更加傷。
+
+詳情頁會顯示 OSM 最後更新日期；資料薄或者陳舊嘅會出提醒，叫你出門前先查下。
 
 Overpass 只喺重建嗰陣用，運行時完全唔會打。`server.js` 仲保留住 `/api/overpass` proxy 方便重建同手動測試。
 
