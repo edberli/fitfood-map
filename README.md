@@ -22,7 +22,8 @@ node serve.mjs 3001
 | 檔案 | 用途 |
 |---|---|
 | `index.html` | 主檔。HTML + CSS + JS 全部喺入面，Leaflet 由 CDN 載 |
-| `data/hk-places.json` | **全港 6,347 間食肆快照**（912 KB），前端唯一 POI 來源 |
+| `data/fit-places.json` | **健身精選名單**（主資料源）—— 逐間由網上研究搜集，有地址、有出處 |
+| `data/hk-places.json` | 全港食肆快照（補充資料源，預設唔顯示） |
 | `data/name-classes.json` | 4,219 個店名 → 兩軸分類對照表 |
 | `data/curated-chains.json` | **已停用**，見下面「人手名單點解停用」 |
 | `data/stock-photos.json` | 示意圖名單（Wikimedia Commons），連授權同作者 |
@@ -30,7 +31,22 @@ node serve.mjs 3001
 | `serve.mjs` | 零依賴 Node server，功能同上 |
 | `public/index.html` | **舊 copy，已經冇用。** 兩個 server 以前 serve 呢個目錄，而家改咗 serve 根目錄 |
 
-## 資料源：由即時 API 改成本地快照
+## 資料源：精選為主，全港為輔
+
+個 app 唔再以「攞晒全港餐廳」為目標。健身人士要嘅唔係 6,297 間，係**真係食得嗰幾百間**。
+
+| 層 | 內容 | 點嚟 |
+|---|---|---|
+| **① 健身精選**（預設） | 逐間研究過、確認過地址嘅健身／高蛋白／沙律／素食店 | ChatGPT Plus 網頁版 + 自家搜尋抓取，逐間人手核格式 |
+| **② 街坊餐廳**（要撳掣先出） | 全港 6,297 間 OSM 食肆 | Overpass 快照 |
+
+**入檔規矩：地址轉唔到真實座標，唔准入。** 呢條就係防止再出現「Chicken Factory 紅磡分店」嗰種唔存在嘅店 —— 個 app 靠距離排序，冇座標即係冇得驗證。
+
+地址轉座標用 Nominatim（免費），有階梯式回退：舖位級地址（「旺角通菜街43號地下B舖」）Nominatim 認唔到，會逐級退到「旺角通菜街43號」→「通菜街, 旺角」。實測 48 間有 46 間轉到（96%）。
+
+重建：`python3 scripts/build_fit_places.py`（讀 `/Volumes/core/fitfood-data/raw/*.txt`）
+
+## 全港快照（補充層）
 
 **以前**每次搜尋都即場打 Overpass。公共 server 成日 504 同 rate limit，結果畫面寫「附近冇店」，實情係「攞唔到資料」—— 分唔清呢兩件事就係最大嘅信任問題。
 

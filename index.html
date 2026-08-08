@@ -462,8 +462,12 @@
       <div class="chips" id="healthChips"></div>
     </div>
     <label class="risky">
+      <input type="checkbox" id="includeOsmBox" onchange="setIncludeOsm(this.checked)">
+      <span>連埋街坊餐廳（OSM 6,297 間）</span>
+    </label>
+    <label class="risky" id="staleWrap" style="margin-left:var(--s-base);display:none">
       <input type="checkbox" id="hideStaleBox" checked onchange="setHideStale(this.checked)">
-      <span>隱藏 6 年冇人更新嘅記錄</span>
+      <span>隱藏 6 年冇更新</span>
     </label>
     <button class="redo" onclick="searchNearby()">重新搜尋</button>
   </div>
@@ -551,7 +555,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08d';
+    const BUILD = '2026-08-08e';
 
     // ============================================================
     // STATE
@@ -877,7 +881,7 @@
       // 而「Chicken Factory (紅磡)」經 OpenRice 官方分店表核實根本唔存在。
       // 作出嚟嘅店比冇資料仲差，所以唔再載入。要重新啟用就要逐間核實過先。
       Promise.all([
-        loadLocalPlaces(), loadStockPhotos(), loadNameClasses()
+        loadFitPlaces(), loadLocalPlaces(), loadStockPhotos(), loadNameClasses()
       ]).finally(startLocating);
     }
 
@@ -1256,9 +1260,9 @@
     function renderDatasetNote() {
       const el = document.getElementById('datasetNote');
       if (!el) return;
-      el.textContent = datasetDate
-        ? `全港 ${LOCAL_PLACES.length.toLocaleString()} 間食肆 · OpenStreetMap 資料截至 ${datasetDate}`
-        : `全港 ${LOCAL_PLACES.length.toLocaleString()} 間食肆 · OpenStreetMap`;
+      const bits = [`健身精選 ${FIT_PLACES.length} 間（網上研究搜集${fitDate ? ' · ' + fitDate : ''}）`];
+      if (includeOsm) bits.push(`街坊餐廳 ${LOCAL_PLACES.length.toLocaleString()} 間 · OpenStreetMap${datasetDate ? ' 截至 ' + datasetDate : ''}`);
+      el.textContent = bits.join(' ｜ ');
     }
 
     function renderLocationBar() {
@@ -1305,6 +1309,25 @@
     let localLoadFailed = false;
     let datasetDate = '';
 
+    // 精選健身餐名單：逐間由網上研究搵返嚟，地址轉得到座標先入檔。
+    // 呢個係主資料源；OSM 嗰 6,297 間降級做補充（撳「連埋街坊餐廳」先出）。
+    let FIT_PLACES = [];
+    let fitDate = '';
+    let includeOsm = false;
+
+    async function loadFitPlaces() {
+      try {
+        const res = await fetch('data/fit-places.json', { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const d = await res.json();
+        FIT_PLACES = d.places || [];
+        fitDate = d.date || '';
+      } catch (err) {
+        console.warn('載入 fit-places.json 失敗:', err.message);
+        FIT_PLACES = [];
+      }
+    }
+
     async function loadLocalPlaces() {
       try {
         const res = await fetch('data/hk-places.json', { cache: 'no-cache' });
@@ -1337,8 +1360,26 @@
       try {
         allPlaces = [];
 
-        // 由本地全港資料集揀出範圍內嘅店。純計算，冇網絡，唔會 timeout。
-        for (let i = 0; i < LOCAL_PLACES.length; i++) {
+        // ① 精選健身餐名單（主資料源）
+        for (let i = 0; i < FIT_PLACES.length; i++) {
+          const r = FIT_PLACES[i];
+          const distance = calcDistance(userPos, { lat: r.a, lng: r.o });
+          if (distance * 1000 > SEARCH_MAX_RADIUS) continue;
+          const place = {
+            meat: r.m || 'other', health: r.s || 'best',
+            id: `fit_${i}`, lat: r.a, lng: r.o,
+            name: r.n, nameEn: '', cuisine: '',
+            address: r.d || '', phone: '', website: '', openingHours: '',
+            categories: new Set(), distance, tags: {},
+            isFit: true, why: r.why || '', srcUrl: r.src || ''
+          };
+          place.description = r.why || '由網上健身飲食推介搜集，適合健身人士。';
+          allPlaces.push(place);
+        }
+
+        // ② OSM 街坊餐廳（補充，預設唔顯示）
+        const fitKeys = new Set(allPlaces.map(p => p.name.toLowerCase().replace(/\W/g, '')));
+        for (let i = 0; includeOsm && i < LOCAL_PLACES.length; i++) {
           const r = LOCAL_PLACES[i];
           const distance = calcDistance(userPos, { lat: r.a, lng: r.o });
           if (distance * 1000 > SEARCH_MAX_RADIUS) continue;
@@ -1357,6 +1398,7 @@
           const cls = (r.m && r.s) ? { meat: r.m, health: r.s }
                                    : classifyPlace(r.n, cuisine, tags);
 
+          if (fitKeys.has(r.n.toLowerCase().replace(/\W/g, ''))) continue;
           const flags = r.q || [];
           const place = {
             meat: cls.meat,
@@ -1700,6 +1742,13 @@
       renderResults();
     }
 
+    function setIncludeOsm(on) {
+      includeOsm = on;
+      const w = document.getElementById('staleWrap');
+      if (w) w.style.display = on ? '' : 'none';
+      searchNearby();
+    }
+
     function setHideStale(on) {
       hideStale = on;
       renderResults();
@@ -1826,7 +1875,8 @@
         const photo = placePhoto(place, usedPhotos);
         if (photo?.stock) usedPhotos.add(photo.url);
         // 兩個標可以並存：左上講來源（精選名單），左下講張相係示意圖
-        const badge = (place.stale ? `<div class="badge warn">${place.updated ? place.updated.slice(0,4) + ' 年後冇更新' : '好耐冇更新'}</div>` : '')
+        const badge = (place.isFit ? '<div class="badge">健身精選</div>' : '')
+                    + (place.stale ? `<div class="badge warn">${place.updated ? place.updated.slice(0,4) + ' 年後冇更新' : '好耐冇更新'}</div>` : '')
                     + (photo?.stock ? '<div class="badge stock bottom">示意圖</div>' : '');
 
         card.innerHTML = `
