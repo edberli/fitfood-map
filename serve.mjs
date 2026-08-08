@@ -139,12 +139,40 @@ async function proxySearch(url, res) {
   }
 }
 
+// GPS 座標 → 地區名。前端直接打公共 Nominatim 會撞 rate limit，所以照樣行同源 proxy。
+async function proxyReverse(url, res) {
+  const lat = url.searchParams.get('lat');
+  const lng = url.searchParams.get('lng');
+  if (!lat || !lng) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'lat and lng are required' }));
+    return;
+  }
+  const nUrl = new URL('https://nominatim.openstreetmap.org/reverse');
+  nUrl.searchParams.set('lat', lat);
+  nUrl.searchParams.set('lon', lng);
+  nUrl.searchParams.set('format', 'json');
+  nUrl.searchParams.set('zoom', '16');
+  try {
+    const r = await fetch(nUrl.toString(), {
+      headers: { 'User-Agent': 'FitFoodMap/1.0' }
+    });
+    const data = await r.text();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(data);
+  } catch {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Reverse geocode failed' }));
+  }
+}
+
 createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
 
   // API routes
   if (url.pathname === '/api/overpass') return proxyOverpass(req, res);
   if (url.pathname === '/api/search') return proxySearch(url, res);
+  if (url.pathname === '/api/reverse') return proxyReverse(url, res);
 
   // Static files
   let filePath = url.pathname === '/' ? '/index.html' : url.pathname;

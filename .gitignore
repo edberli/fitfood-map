@@ -5,3 +5,6 @@ node_modules/
 # iCloud 抽走咗本體、讀唔到嘅舊 .git
 .git.icloud-dataless/
 
+
+# 本機開發用嘅 launcher 設定
+.claude/

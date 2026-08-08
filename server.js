@@ -91,6 +91,32 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+// Proxy Nominatim reverse (GPS 座標 → 地區名)
+// 前端直接打公共 Nominatim 會撞 rate limit，所以同 search 一樣行同源 proxy
+app.get('/api/reverse', async (req, res) => {
+  const { lat, lng } = req.query;
+
+  if (!lat || !lng) {
+    return res.status(400).json({ error: 'lat and lng are required' });
+  }
+
+  const url = new URL('https://nominatim.openstreetmap.org/reverse');
+  url.searchParams.set('lat', lat);
+  url.searchParams.set('lon', lng);
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('zoom', '16');
+
+  try {
+    const response = await fetch(url.toString(), {
+      headers: { 'User-Agent': 'FitFoodMap/1.0' }
+    });
+    res.type('application/json').send(await response.text());
+  } catch (err) {
+    console.error('Nominatim reverse error:', err);
+    res.status(500).json({ error: 'Failed to reverse geocode' });
+  }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
