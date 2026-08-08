@@ -555,7 +555,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08g';
+    const BUILD = '2026-08-08h';
 
     // ============================================================
     // STATE
@@ -1380,8 +1380,12 @@
         // ② OSM 入面「雞肉／無肉 + 最健康」嗰批（雞飯、手撕雞、海南雞、素食、沙律）
         //    本身就係健身人士要搵嘅嘢，之前被埋喺補充層預設睇唔到 —— 提升做預設顯示。
         //    其餘 OSM 記錄仍然要撳「連埋街坊餐廳」先出。
+        //
+        //    一開始只放雞肉／無肉，但咁樣就漏咗粥品（一品生記粥店）、刺身、
+        //    清湯腩、越南河粉 —— 呢啲全部都係「最健康」級，本身就通過咗判斷。
+        //    健康程度軸已經做咗篩選，唔需要再用肉類軸二次收窄。
         const fitKeys = new Set(allPlaces.map(p => p.name.toLowerCase().replace(/\W/g, '')));
-        const OSM_FIT = (r) => r.s === 'best' && (r.m === 'chicken' || r.m === 'none');
+        const OSM_FIT = (r) => r.s === 'best';
         for (let i = 0; i < LOCAL_PLACES.length; i++) {
           if (!includeOsm && !OSM_FIT(LOCAL_PLACES[i])) continue;
           const r = LOCAL_PLACES[i];
