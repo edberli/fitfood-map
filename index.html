@@ -555,7 +555,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08h';
+    const BUILD = '2026-08-08i';
 
     // ============================================================
     // STATE
@@ -1381,11 +1381,14 @@
         //    本身就係健身人士要搵嘅嘢，之前被埋喺補充層預設睇唔到 —— 提升做預設顯示。
         //    其餘 OSM 記錄仍然要撳「連埋街坊餐廳」先出。
         //
-        //    一開始只放雞肉／無肉，但咁樣就漏咗粥品（一品生記粥店）、刺身、
-        //    清湯腩、越南河粉 —— 呢啲全部都係「最健康」級，本身就通過咗判斷。
-        //    健康程度軸已經做咗篩選，唔需要再用肉類軸二次收窄。
+        //    規則試過兩次都太窄：
+        //      第一次只放「雞肉／無肉 + 最健康」→ 漏咗粥品、刺身、清湯腩
+        //      第二次只放「最健康」→ 漏咗窯雞王、Chicken Factory（判咗做 chicken/normal）
+        //    問題係用「提升規則」做咗第二重篩選，同用戶自己嘅健康程度掣打交。
+        //    而家：所有雞肉同無肉店（唔理健康級）+ 所有最健康店，一律開放；
+        //    收窄邊啲出現交返俾兩個篩選掣做。撳「雞肉+普通」先見到窯雞王。
         const fitKeys = new Set(allPlaces.map(p => p.name.toLowerCase().replace(/\W/g, '')));
-        const OSM_FIT = (r) => r.s === 'best';
+        const OSM_FIT = (r) => r.s === 'best' || r.m === 'chicken' || r.m === 'none';
         for (let i = 0; i < LOCAL_PLACES.length; i++) {
           if (!includeOsm && !OSM_FIT(LOCAL_PLACES[i])) continue;
           const r = LOCAL_PLACES[i];
