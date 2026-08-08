@@ -555,7 +555,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08f';
+    const BUILD = '2026-08-08g';
 
     // ============================================================
     // STATE
@@ -1852,13 +1852,13 @@
           popupAnchor: [0, -18]
         });
 
-        const mapsUrl = getMapsUrl(place);
+        const mapsUrl = getMapsLookupUrl(place);
 
         const marker = L.marker([place.lat, place.lng], { icon: markerIcon }).addTo(map);
         marker.bindPopup(`
           <div class="popup-name">${place.name}</div>
           ${place.address ? `<div class="popup-addr">${place.address}</div>` : ''}
-          <a class="popup-nav" href="${mapsUrl}" target="_blank" rel="noopener">導航</a>
+          <a class="popup-nav" href="${mapsUrl}" target="_blank" rel="noopener">Google 睇呢間店</a>
         `, { maxWidth: 240 });
 
         marker.on('click', () => {
@@ -1972,8 +1972,8 @@
 
       document.getElementById('detailTags').innerHTML = axisTags(place);
 
-      const mapsUrl = getMapsUrl(place);
-      const lookupUrl = getMapsLookupUrl(place);
+      const navUrl = getMapsUrl(place);           // 純座標，精確落釘
+      const mapsUrl = getMapsLookupUrl(place);     // 店名 + 視窗，睇得到結業狀態
 
       let hoursHTML = '';
       if (place.openingHours) {
@@ -1990,7 +1990,7 @@
       if (place.updated) infoRows += `<div class="info-row"><span class="info-label">最後更新</span><span class="info-value">${place.updated}（OpenStreetMap）</span></div>`;
       // 座標攤出嚟，畀你自己核對個位啱唔啱 —— 唔好淨係叫你信
       infoRows += `<div class="info-row"><span class="info-label">座標</span><span class="info-value">` +
-        `<a href="${mapsUrl}" target="_blank" rel="noopener">${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}</a></span></div>`;
+        `<a href="${navUrl}" target="_blank" rel="noopener">${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}</a></span></div>`;
 
       const photo = placePhoto(place);
       const photoHTML = photo
@@ -2011,10 +2011,8 @@
         <div class="detail-info-grid">${infoRows}</div>
         ${hoursHTML}
         <div class="detail-actions">
-          <a class="btn-primary" href="${mapsUrl}" target="_blank" rel="noopener">導航去呢個位</a>
-          ${place.phone
-            ? `<a class="btn-outline" href="tel:${place.phone}">致電餐廳</a>`
-            : `<a class="btn-outline" href="${lookupUrl}" target="_blank" rel="noopener">Google 搵呢間店</a>`}
+          <a class="btn-primary" href="${mapsUrl}" target="_blank" rel="noopener">Google 睇呢間店</a>
+          <a class="btn-outline" href="${navUrl}" target="_blank" rel="noopener">導航去呢個位</a>
         </div>
       `;
 
