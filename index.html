@@ -176,7 +176,7 @@
       transition:transform .2s,box-shadow .2s,background .2s}
     .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);background:var(--glass-strong)}
     .card.selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-soft),var(--shadow-lift)}
-    .photo{position:relative;aspect-ratio:3/2;overflow:hidden;display:grid;place-items:center;
+    .photo{position:relative;aspect-ratio:2/1;overflow:hidden;display:grid;place-items:center;
       background:rgba(255,255,255,.3)}
     /* 真相／示意圖：載唔到就自動除咗佢，露返下面個底字。
        故意唔用 opacity 淡入 —— 背景 tab 嘅 transition 會凍住，張相就永遠唔現形。 */
@@ -203,7 +203,14 @@
     .go svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
     @media (hover:none){.go{opacity:1}}
 
-    .cbody{padding:var(--s-md) var(--s-base) var(--s-base)}
+    .cbody{padding:var(--s-base);position:relative}
+    .go.inline{position:absolute;top:12px;right:12px;opacity:1;width:28px;height:28px;
+      background:rgba(255,255,255,.7);box-shadow:none;border:1px solid var(--glass-border)}
+    .row{padding-right:34px}
+    .why{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:7px;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .mini-tag.pick{background:rgba(31,111,156,.14);color:var(--primary)}
+    .mini-tag.warn{background:rgba(190,110,40,.14);color:#95571c}
     .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
     .name{font-size:15.5px;font-weight:600;color:var(--ink);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .rate{font-size:13.5px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
@@ -555,7 +562,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-08i';
+    const BUILD = '2026-08-09a';
 
     // ============================================================
     // STATE
@@ -834,12 +841,13 @@
       return pool[start];
     }
 
-    // 回 { url, stock } —— stock:true 代表係示意圖，卡片要標明
-    function placePhoto(place, used) {
+    // 只用真店相（OSM image / wikimedia_commons tag）。
+    // 通用「示意圖」已經拆走 —— 唔係嗰間店嘅相，佔咗半張卡但零資訊，
+    // 而且睇落似真相，容易誤導。真店相要 Google Places API（收費），
+    // 所以實際上絕大部分卡片係純文字。
+    function placePhoto(place) {
       const real = realPhoto(place);
-      if (real) return { url: real, stock: false };
-      const stock = stockPhoto(place, used);
-      return stock ? { url: stock, stock: true } : null;
+      return real ? { url: real, stock: false } : null;
     }
 
     // 冇相時卡片顯示嘅字：中文取首字，英文取頭兩個字母
@@ -1845,8 +1853,6 @@
 
       // 幾十個藥丸標記疊埋一齊等於乜都睇唔到，過咗呢個數就全部縮做點
       const compactPins = places.length > COMPACT_PIN_THRESHOLD;
-      // 同一頁盡量唔好出重複示意圖
-      const usedPhotos = new Set();
 
       places.forEach((place) => {
         const dist = formatDistance(place.distance);
@@ -1883,33 +1889,29 @@
 
         const meta = [place.cuisine, place.address].filter(Boolean).join(' · ');
         const isCurated = String(place.id).startsWith('cur_');
-        const photo = placePhoto(place, usedPhotos);
-        if (photo?.stock) usedPhotos.add(photo.url);
+        const photo = placePhoto(place);
         // 兩個標可以並存：左上講來源（精選名單），左下講張相係示意圖
-        const badge = (place.isFit ? '<div class="badge">健身精選</div>' : '')
-                    + (place.stale ? `<div class="badge warn">${place.updated ? place.updated.slice(0,4) + ' 年後冇更新' : '好耐冇更新'}</div>` : '')
-                    + (photo?.stock ? '<div class="badge stock bottom">示意圖</div>' : '');
+        const badge = '';
 
         card.innerHTML = `
-          <div class="photo ${TONE[place.meat] || TONE.other}">
-            <span class="ph-glyph">${nameGlyph(place.name)}</span>
-            ${photo ? `<img class="ph-img" src="${photo.url}" alt="" loading="lazy" decoding="async"
-                 onerror="this.remove()">` : ''}
+          ${photo ? `<div class="photo ${TONE[place.meat] || TONE.other}">
+            <img class="ph-img" src="${photo.url}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.remove()">
             ${badge}
-            <a class="go" href="${mapsUrl}" target="_blank" rel="noopener"
-               onclick="event.stopPropagation()" title="Google Maps 導航" aria-label="Google Maps 導航">
+          </div>` : ''}
+          <div class="cbody">
+            <a class="go inline" href="${mapsUrl}" target="_blank" rel="noopener"
+               onclick="event.stopPropagation()" title="喺 Google Maps 睇呢間店" aria-label="喺 Google Maps 睇呢間店">
               <svg viewBox="0 0 24 24"><path d="M8 16 16 8M9.5 8H16v6.5"/></svg>
             </a>
-          </div>
-          <div class="cbody">
             <div class="row">
               <div class="name">${place.name}</div>
               <div class="rate">
                 <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.6A2.6 2.6 0 1 1 12 6.4a2.6 2.6 0 0 1 0 5.2z"/></svg>${dist}
               </div>
             </div>
-            <div class="meta">${meta || '附近餐廳'}</div>
-            <div class="tags">${axisTags(place)}</div>
+            <div class="meta">${meta || place.address || '附近餐廳'}</div>
+            ${place.why ? `<div class="why">${place.why}</div>` : ''}
+            <div class="tags">${axisTags(place)}${place.isFit ? '<span class="mini-tag pick">健身精選</span>' : ''}${place.stale ? '<span class="mini-tag warn">好耐冇更新</span>' : ''}</div>
           </div>
         `;
 
