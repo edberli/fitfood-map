@@ -455,10 +455,10 @@
     <div class="seg">
       <div class="k">範圍</div>
       <select class="v" id="radiusSelect" onchange="setRadiusMode(this.value)">
-        <option value="auto">自動（唔夠就放大）</option>
+        <option value="auto">3km 內全部（預設）</option>
+        <option value="500">500m 內</option>
         <option value="800">800m 內</option>
         <option value="1500">1.5km 內</option>
-        <option value="3000">3km 內</option>
       </select>
     </div>
     <div class="seg-end">
@@ -486,11 +486,9 @@
 
 <div class="wrap">
   <div class="filters glass" id="filterBar">
-    <div class="seg-ctl" id="meatSeg"></div>
-
-    <div class="slider-wrap">
+    <div class="slider-wrap wide">
       <input type="range" id="healthRange" min="0" max="3" step="1" value="3"
-             oninput="setHealthByIndex(this.value)" aria-label="健康程度">
+             oninput="setCatByIndex(this.value)" aria-label="類別">
       <div class="ticks" id="healthTicks"></div>
     </div>
 
@@ -537,10 +535,11 @@
   <div class="wrap">
     <div class="fgrid">
       <div>
-        <h4>健康程度點分</h4>
-        <p><b>最健康</b> —— 蒸、灼、白切、沙律、刺身、素食、明寫健康</p>
-        <p><b>普通</b> —— 一般餐廳、燒／炒／飯麵</p>
+        <h4>分類點分</h4>
+        <p><b>素食</b> —— 素食、齋、純素、沙律專門店</p>
+        <p><b>健身</b> —— 蒸、灼、白切、海南雞、刺身、粥、明寫高蛋白低脂</p>
         <p><b>快樂</b> —— 炸物、漢堡、拉麵、火鍋、甜品、奶茶</p>
+        <p><b>全部</b> —— 唔篩，包埋一般餐廳</p>
       </div>
       <div>
         <h4>資料源</h4>
@@ -592,7 +591,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-09b';
+    const BUILD = '2026-08-09d';
 
     // ============================================================
     // STATE
@@ -604,34 +603,32 @@
     let userPos = null;
     let currentRadius = 800;
 
-    // 兩軸篩選：食乜肉 × 幾健康
-    const MEAT_FILTERS = [
-      { key: 'any', label: '冇所謂' },
-      { key: 'none', label: '無肉' },
-      { key: 'chicken', label: '雞肉' },
-      { key: 'beef', label: '牛肉' }
-    ];
-    // 滑桿由左到右：最健康 → 普通 → 快樂 → 全部
-    const HEALTH_FILTERS = [
-      { key: 'best', label: '最健康' },
-      { key: 'normal', label: '普通' },
+    // 一條軸就夠。兩軸（食乜肉 × 健康程度）要諗兩次先揀到嘢，太煩。
+    const CAT_FILTERS = [
+      { key: 'veg',   label: '素食' },
+      { key: 'fit',   label: '健身' },
       { key: 'happy', label: '快樂' },
-      { key: 'all', label: '全部' }
+      { key: 'all',   label: '全部' }
     ];
-    let filterMeat = 'any';
-    let filterHealth = 'all';   // 預設全部 —— 先睇晒附近有咩，再自己收窄
+    // 每個類別點界定 —— 用返資料入面本身有嘅兩軸值
+    const CAT_TEST = {
+      veg:   p => p.meat === 'none',
+      fit:   p => p.health === 'best',
+      happy: p => p.health === 'happy',
+      all:   () => true
+    };
+
+    let filterCat = 'all';   // 預設全部 —— 先睇晒附近有咩，再自己收窄
     // OSM 有啲記錄好耐冇人掂過，好可能已經結業。預設隱藏 —— 行到過去先發現冇，
     // 比少見幾間更加傷。想睇返就撳個掣。
     let hideStale = true;
 
-    const MEAT_LABELS = { none: '無肉', chicken: '雞肉', beef: '牛肉', other: '' };
-    const HEALTH_LABELS = { best: '最健康', normal: '普通', happy: '快樂', unknown: '未分類' };
+    const MEAT_LABELS = { none: '素食', chicken: '雞肉', beef: '牛肉', other: '' };
+    const HEALTH_LABELS = { best: '健身', normal: '普通', happy: '快樂', unknown: '' };
 
     // Overpass 一次過攞晒 3km，之後喺前端逐層收窄 —— 唔使為咗擴大範圍再打多次 API。
-    // 預設由 800m（約 10 分鐘步程）起，夠 MIN_RESULTS 間就唔擴大。
+    // 一次過攞晒 3km 內，範圍收窄由用戶自己揀（搜尋欄「範圍」）。
     const SEARCH_MAX_RADIUS = 3000;
-    const RADIUS_STEPS = [800, 1500, 3000];
-    const MIN_RESULTS = 8;
     // 多過呢個數，地圖標記就由藥丸縮做細點
     const COMPACT_PIN_THRESHOLD = 24;
     // 'auto' = 逐層放大；數字 = 鎖死喺呢個半徑
@@ -1766,24 +1763,20 @@
     // FILTER
     // ============================================================
     function buildChips() {
-      document.getElementById('meatSeg').innerHTML = MEAT_FILTERS.map(f =>
-        `<button class="seg-btn${f.key === filterMeat ? ' on' : ''}" data-meat="${f.key}"
-           onclick="setMeat('${f.key}')">${f.label}</button>`).join('');
+      // 刻度標籤本身撳得，唔使一定拖條滑桿
+      document.getElementById('healthTicks').innerHTML = CAT_FILTERS.map((f, i) =>
+        `<button class="tick${f.key === filterCat ? ' on' : ''}" data-cat="${f.key}"
+           onclick="setCatByIndex(${i})">${f.label}</button>`).join('');
 
-      // 滑桿刻度：撳個標籤都揀得，唔使一定拖
-      document.getElementById('healthTicks').innerHTML = HEALTH_FILTERS.map((f, i) =>
-        `<button class="tick${f.key === filterHealth ? ' on' : ''}" data-health="${f.key}"
-           onclick="setHealthByIndex(${i})">${f.label}</button>`).join('');
-
-      const idx = HEALTH_FILTERS.findIndex(f => f.key === filterHealth);
-      document.getElementById('healthRange').value = idx < 0 ? 3 : idx;
+      const idx = CAT_FILTERS.findIndex(f => f.key === filterCat);
+      document.getElementById('healthRange').value = idx < 0 ? CAT_FILTERS.length - 1 : idx;
     }
 
-    function setHealthByIndex(i) {
-      const f = HEALTH_FILTERS[Number(i)];
+    function setCatByIndex(i) {
+      const f = CAT_FILTERS[Number(i)];
       if (!f) return;
       document.getElementById('healthRange').value = i;
-      setHealth(f.key);
+      setCat(f.key);
     }
 
     function toggleMore() {
@@ -1795,17 +1788,10 @@
       b.classList.toggle('on', open);
     }
 
-    function setMeat(key) {
-      filterMeat = key;
-      document.querySelectorAll('#meatSeg .seg-btn').forEach(c =>
-        c.classList.toggle('on', c.dataset.meat === key));
-      renderResults();
-    }
-
-    function setHealth(key) {
-      filterHealth = key;
+    function setCat(key) {
+      filterCat = key;
       document.querySelectorAll('#healthTicks .tick').forEach(c =>
-        c.classList.toggle('on', c.dataset.health === key));
+        c.classList.toggle('on', c.dataset.cat === key));
       renderResults();
     }
 
@@ -1837,24 +1823,22 @@
     }
 
     function getFilteredPlaces() {
+      const test = CAT_TEST[filterCat] || CAT_TEST.all;
       const matching = allPlaces.filter(p => {
-        if (filterMeat !== 'any' && p.meat !== filterMeat) return false;
-        if (filterHealth !== 'all' && p.health !== filterHealth) return false;
+        if (!test(p)) return false;
         if (hideStale && p.stale) return false;
         return true;
       });
 
-      // 鎖死半徑就用嗰個；'auto' 就逐層放大 —— 例如「無肉 + 最健康」800m 內冇，自動放到 3km
-      currentRadius = radiusMode === 'auto' ? pickRadius(matching) : Number(radiusMode);
+      // 「自動」= 唔收窄，直接出晒 3km 內全部，按距離排。
+      //
+      // 以前係「夠 8 間就唔擴大」，結果半徑會隨篩選上落：
+      //   揀「健身」得幾間 → 放到 3km → 42 間
+      //   揀「全部」800m 已經夠 8 間 → 縮返 800m → 14 間
+      // 放寬篩選反而見少咗店 —— 用戶投訴「本身有嘅而家冇咗」就係呢個。
+      // 名單本身按距離排，遠嘅自然排後面，冇理由剷走佢。
+      currentRadius = radiusMode === 'auto' ? SEARCH_MAX_RADIUS : Number(radiusMode);
       return matching.filter(p => p.distance * 1000 <= currentRadius);
-    }
-
-    // 由最細一層開始，夠數就唔再擴大
-    function pickRadius(places) {
-      for (const r of RADIUS_STEPS) {
-        if (places.filter(p => p.distance * 1000 <= r).length >= MIN_RESULTS) return r;
-      }
-      return RADIUS_STEPS[RADIUS_STEPS.length - 1];
     }
 
     function formatRadius(m) {
@@ -1869,11 +1853,13 @@
 
     // 卡片／詳情上面嘅標籤 = 兩軸嘅值
     function axisTags(place) {
-      const meatLabel = MEAT_LABELS[place.meat];
-      const healthLabel = HEALTH_LABELS[place.health] || '';
       let html = '';
-      if (meatLabel) html += `<span class="mini-tag meat">${meatLabel}</span>`;
-      if (healthLabel) html += `<span class="mini-tag h-${place.health}">${healthLabel}</span>`;
+      if (place.meat === 'none') html += '<span class="mini-tag h-best">素食</span>';
+      else if (MEAT_LABELS[place.meat]) html += `<span class="mini-tag meat">${MEAT_LABELS[place.meat]}</span>`;
+      const hl = HEALTH_LABELS[place.health];
+      if (hl && !(place.meat === 'none' && place.health === 'best')) {
+        html += `<span class="mini-tag h-${place.health}">${hl}</span>`;
+      }
       return html;
     }
 
@@ -1889,7 +1875,7 @@
       countEl.textContent = `${places.length} 間`;
       // 講明而家搵緊幾遠，唔好等用戶自己估
       const radiusText = formatRadius(currentRadius);
-      if (radiusEl) radiusEl.textContent = radiusText + (radiusMode === 'auto' ? '（自動）' : '');
+      if (radiusEl) radiusEl.textContent = radiusText;
 
       if (places.length === 0) {
         list.innerHTML = emptyState(ICON_SEARCH_EMPTY,
