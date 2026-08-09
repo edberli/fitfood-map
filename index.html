@@ -140,24 +140,50 @@
       color:var(--primary);font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:var(--r-full);cursor:pointer}
     .locfix:hover{background:#fff}
 
-    /* ---------- 兩軸篩選 ---------- */
-    .filters{margin:var(--s-lg) 0 0;border-radius:var(--r-lg);padding:var(--s-base) var(--s-lg);
-      display:flex;flex-wrap:wrap;gap:var(--s-base) var(--s-xl);align-items:center}
-    .axis{display:flex;align-items:center;gap:var(--s-md);min-width:0}
-    .axis-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;white-space:nowrap}
-    .chips{display:flex;gap:6px;flex-wrap:wrap}
-    .chip{font-size:13px;font-weight:600;color:var(--body);cursor:pointer;white-space:nowrap;
-      padding:8px 15px;border-radius:var(--r-full);border:1px solid transparent;
-      background:rgba(255,255,255,.44);transition:.15s}
-    .chip:hover{background:rgba(255,255,255,.86);color:var(--ink)}
-    .chip.on{background:var(--primary);color:var(--on-primary);box-shadow:0 3px 12px rgba(31,111,156,.32)}
-    .risky{display:flex;align-items:center;gap:7px;margin-left:auto;font-size:12.5px;
+    /* ---------- 兩軸篩選：分段掣 + 滑桿 ---------- */
+    /* 貼住頂 —— 一路碌一路揀得，唔使碌返上去 */
+    .filters{position:sticky;top:76px;z-index:400;
+      margin:var(--s-base) 0 0;border-radius:var(--r-full);
+      padding:10px 12px;display:flex;align-items:center;gap:var(--s-lg)}
+
+    /* 食乜肉：分段掣 */
+    .seg-ctl{display:flex;flex:0 0 auto;background:rgba(255,255,255,.45);
+      border-radius:var(--r-full);padding:3px;gap:2px}
+    .seg-btn{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;
+      padding:7px 14px;border:0;border-radius:var(--r-full);background:transparent;transition:.15s}
+    .seg-btn:hover{color:var(--ink)}
+    .seg-btn.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(19,41,61,.14)}
+
+    /* 健康程度：真滑桿。呢個軸本身有次序（最健康→普通→快樂），所以用滑桿
+       比並列掣直觀 —— 拖右邊即係越放縱。刻度標籤本身可撳，唔使一定拖。 */
+    .slider-wrap{flex:1;min-width:150px;max-width:420px;padding:0 4px}
+    #healthRange{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
+      background:linear-gradient(90deg,#2f8f68,#1f6f9c 55%,#c0562f);outline:none;cursor:pointer}
+    #healthRange::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+      background:#fff;border:2px solid var(--primary);cursor:grab;
+      box-shadow:0 2px 8px rgba(19,41,61,.28)}
+    #healthRange::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;
+      border:2px solid var(--primary);cursor:grab;box-shadow:0 2px 8px rgba(19,41,61,.28)}
+    .ticks{display:flex;justify-content:space-between;margin-top:5px}
+    .tick{font-size:11px;font-weight:500;color:var(--muted-soft);background:none;border:0;
+      cursor:pointer;padding:2px 4px;white-space:nowrap;transition:.15s}
+    .tick:hover{color:var(--ink)}
+    .tick.on{color:var(--primary);font-weight:700}
+
+    .more{flex:0 0 auto;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
+      background:none;border:1px solid var(--glass-border);border-radius:var(--r-full);padding:8px 14px}
+    .more:hover,.more.on{color:var(--primary);border-color:var(--primary)}
+
+    .more-panel{margin-top:var(--s-sm);border-radius:var(--r-lg);padding:var(--s-base);
+      display:flex;align-items:center;gap:var(--s-lg);flex-wrap:wrap}
+    .more-panel[hidden]{display:none}
+    .risky{display:flex;align-items:center;gap:7px;font-size:12.5px;
       color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none}
     .risky input{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
     .risky:hover{color:var(--ink)}
-    .filters .redo{margin-left:var(--s-base);font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;
+    .redo{margin-left:auto;font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;
       background:none;border:0;padding:8px 4px;white-space:nowrap}
-    .filters .redo:hover{text-decoration:underline}
+    .redo:hover{text-decoration:underline}
 
     /* ---------- split: list + map ---------- */
     .split{display:grid;grid-template-columns:1fr 44%;gap:var(--s-xl);padding:var(--s-lg) 0 var(--s-section)}
@@ -459,22 +485,26 @@
 </div>
 
 <div class="wrap">
-  <div class="filters glass">
-    <div class="axis">
-      <span class="axis-label">食乜肉</span>
-      <div class="chips" id="meatChips"></div>
+  <div class="filters glass" id="filterBar">
+    <div class="seg-ctl" id="meatSeg"></div>
+
+    <div class="slider-wrap">
+      <input type="range" id="healthRange" min="0" max="3" step="1" value="3"
+             oninput="setHealthByIndex(this.value)" aria-label="健康程度">
+      <div class="ticks" id="healthTicks"></div>
     </div>
-    <div class="axis">
-      <span class="axis-label">健康程度</span>
-      <div class="chips" id="healthChips"></div>
-    </div>
+
+    <button class="more" id="moreBtn" onclick="toggleMore()" aria-expanded="false">更多</button>
+  </div>
+
+  <div class="more-panel glass" id="morePanel" hidden>
     <label class="risky">
       <input type="checkbox" id="includeOsmBox" onchange="setIncludeOsm(this.checked)">
       <span>連埋街坊餐廳（OSM 6,297 間）</span>
     </label>
-    <label class="risky" id="staleWrap" style="margin-left:var(--s-base);display:none">
+    <label class="risky" id="staleWrap" style="display:none">
       <input type="checkbox" id="hideStaleBox" checked onchange="setHideStale(this.checked)">
-      <span>隱藏 6 年冇更新</span>
+      <span>隱藏 6 年冇更新嘅記錄</span>
     </label>
     <button class="redo" onclick="searchNearby()">重新搜尋</button>
   </div>
@@ -562,7 +592,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-09a';
+    const BUILD = '2026-08-09b';
 
     // ============================================================
     // STATE
@@ -581,16 +611,15 @@
       { key: 'chicken', label: '雞肉' },
       { key: 'beef', label: '牛肉' }
     ];
+    // 滑桿由左到右：最健康 → 普通 → 快樂 → 全部
     const HEALTH_FILTERS = [
       { key: 'best', label: '最健康' },
       { key: 'normal', label: '普通' },
       { key: 'happy', label: '快樂' },
-      { key: 'unknown', label: '未分類' },
       { key: 'all', label: '全部' }
     ];
-    // 呢個 app 叫 FitFood，所以預設由最健康起，想放縱自己撳「快樂」
     let filterMeat = 'any';
-    let filterHealth = 'best';
+    let filterHealth = 'all';   // 預設全部 —— 先睇晒附近有咩，再自己收窄
     // OSM 有啲記錄好耐冇人掂過，好可能已經結業。預設隱藏 —— 行到過去先發現冇，
     // 比少見幾間更加傷。想睇返就撳個掣。
     let hideStale = true;
@@ -1737,26 +1766,45 @@
     // FILTER
     // ============================================================
     function buildChips() {
-      const meatBox = document.getElementById('meatChips');
-      const healthBox = document.getElementById('healthChips');
-      meatBox.innerHTML = MEAT_FILTERS.map(f =>
-        `<button class="chip${f.key === filterMeat ? ' on' : ''}" data-meat="${f.key}"
+      document.getElementById('meatSeg').innerHTML = MEAT_FILTERS.map(f =>
+        `<button class="seg-btn${f.key === filterMeat ? ' on' : ''}" data-meat="${f.key}"
            onclick="setMeat('${f.key}')">${f.label}</button>`).join('');
-      healthBox.innerHTML = HEALTH_FILTERS.map(f =>
-        `<button class="chip${f.key === filterHealth ? ' on' : ''}" data-health="${f.key}"
-           onclick="setHealth('${f.key}')">${f.label}</button>`).join('');
+
+      // 滑桿刻度：撳個標籤都揀得，唔使一定拖
+      document.getElementById('healthTicks').innerHTML = HEALTH_FILTERS.map((f, i) =>
+        `<button class="tick${f.key === filterHealth ? ' on' : ''}" data-health="${f.key}"
+           onclick="setHealthByIndex(${i})">${f.label}</button>`).join('');
+
+      const idx = HEALTH_FILTERS.findIndex(f => f.key === filterHealth);
+      document.getElementById('healthRange').value = idx < 0 ? 3 : idx;
+    }
+
+    function setHealthByIndex(i) {
+      const f = HEALTH_FILTERS[Number(i)];
+      if (!f) return;
+      document.getElementById('healthRange').value = i;
+      setHealth(f.key);
+    }
+
+    function toggleMore() {
+      const p = document.getElementById('morePanel');
+      const b = document.getElementById('moreBtn');
+      const open = p.hidden;
+      p.hidden = !open;
+      b.setAttribute('aria-expanded', String(open));
+      b.classList.toggle('on', open);
     }
 
     function setMeat(key) {
       filterMeat = key;
-      document.querySelectorAll('#meatChips .chip').forEach(c =>
+      document.querySelectorAll('#meatSeg .seg-btn').forEach(c =>
         c.classList.toggle('on', c.dataset.meat === key));
       renderResults();
     }
 
     function setHealth(key) {
       filterHealth = key;
-      document.querySelectorAll('#healthChips .chip').forEach(c =>
+      document.querySelectorAll('#healthTicks .tick').forEach(c =>
         c.classList.toggle('on', c.dataset.health === key));
       renderResults();
     }
