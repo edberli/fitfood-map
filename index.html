@@ -12,541 +12,353 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      /* 淺藍磨砂玻璃 */
-      --primary:#1f6f9c; --primary-active:#175677; --primary-soft:rgba(31,111,156,.12);
-      --ink:#13293d; --body:#2f4a63; --muted:#5b7896; --muted-soft:#8aa4be;
-      --hairline:rgba(23,58,89,.14); --hairline-soft:rgba(23,58,89,.08); --border-strong:rgba(23,58,89,.28);
-      --on-primary:#ffffff;
-
-      /* 玻璃層 */
-      --glass:rgba(255,255,255,.52);
-      --glass-strong:rgba(255,255,255,.74);
-      --glass-quiet:rgba(255,255,255,.34);
-      --glass-border:rgba(255,255,255,.62);
-      --glass-blur:blur(20px) saturate(165%);
-      --shadow-glass:0 8px 32px rgba(19,41,61,.11);
-      --shadow-card:0 12px 34px rgba(19,41,61,.16);
-      --shadow-lift:0 18px 46px rgba(19,41,61,.2);
-
-      --r-xs:4px; --r-sm:10px; --r-md:16px; --r-lg:22px; --r-xl:30px; --r-full:9999px;
-      --s-xs:4px; --s-sm:8px; --s-md:12px; --s-base:16px; --s-lg:24px; --s-xl:32px; --s-xxl:48px; --s-section:64px;
+      /* OpenRice 骨架，換綠色。實色品牌欄 + 白底 + 灰場，資訊密度行先。 */
+      --brand:#1a9e56; --brand-dark:#147a42; --brand-tint:#e9f6ef; --brand-ink:#0e5c31;
+      --field:#f2f3f5; --paper:#ffffff;
+      --ink:#1c1c1c; --body:#3c3c3c; --muted:#767676; --faint:#9b9b9b;
+      --line:#e5e5e5; --line-soft:#f0f0f0;
+      --warn:#c1611c; --warn-tint:#fdf2e8;
+      --r-sm:3px; --r-md:6px; --r-lg:10px; --r-full:9999px;
+      --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:28px; --s-7:40px;
+      --head-h:56px;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html{-webkit-text-size-adjust:100%}
-    body{
-      font-family:Inter,-apple-system,"Noto Sans TC","PingFang TC","Helvetica Neue",system-ui,sans-serif;
-      color:var(--body); -webkit-font-smoothing:antialiased;
-      min-height:100vh;
-      background:
-        radial-gradient(1100px 620px at 12% -8%, rgba(255,255,255,.92), transparent 60%),
-        radial-gradient(900px 560px at 88% 4%, rgba(178,220,246,.62), transparent 62%),
-        radial-gradient(760px 520px at 50% 108%, rgba(139,186,222,.42), transparent 60%),
-        linear-gradient(168deg,#eef6fc 0%,#dcebf7 46%,#c9dced 100%);
-      background-attachment:fixed;
-    }
+    body{font-family:Inter,-apple-system,"Noto Sans TC","PingFang TC",system-ui,sans-serif;
+      background:var(--field);color:var(--body);-webkit-font-smoothing:antialiased}
     button,input,select{font:inherit;color:inherit}
-    a{color:inherit}
-    .wrap{max-width:1280px;margin:0 auto;padding:0 var(--s-lg)}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1220px;margin:0 auto;padding:0 var(--s-4)}
+    :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
-    /* 玻璃底板 —— 全站所有面都用呢個配方 */
-    .glass{
-      background:var(--glass);
-      backdrop-filter:var(--glass-blur);
-      -webkit-backdrop-filter:var(--glass-blur);
-      border:1px solid var(--glass-border);
-      box-shadow:var(--shadow-glass);
-    }
-
-    /* ---------- top nav ---------- */
-    header{position:sticky;top:0;z-index:600;
-      background:rgba(255,255,255,.46);
-      backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-      border-bottom:1px solid var(--glass-border)}
-    .nav{display:flex;align-items:center;justify-content:space-between;height:76px;gap:var(--s-lg)}
-    .logo{display:flex;align-items:center;gap:9px;color:var(--primary);font-size:21px;font-weight:700;letter-spacing:-.4px;white-space:nowrap}
-    .logo .mark{width:26px;height:26px;border-radius:var(--r-full);
-      background:conic-gradient(from 200deg,var(--primary),#6fb4d8,var(--primary));
-      box-shadow:inset 0 0 0 3px rgba(255,255,255,.75)}
-    .tabs{display:flex;gap:var(--s-lg);align-items:center}
-    .tab{font-size:15px;font-weight:600;color:var(--muted);padding:6px 0;position:relative;cursor:pointer;background:none;border:0}
-    .tab.active{color:var(--ink)}
-    .tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--primary);border-radius:2px}
-    .tab .new{position:absolute;top:-10px;right:-30px;font-size:8px;font-weight:700;letter-spacing:.32px;text-transform:uppercase;
-      background:var(--primary);color:#fff;padding:3px 5px;border-radius:var(--r-xs)}
-    .nav-right{display:flex;align-items:center;gap:var(--s-sm)}
-    .ghost{font-size:14px;font-weight:500;padding:9px 14px;border-radius:var(--r-full);cursor:pointer;
-      background:none;border:0;white-space:nowrap;color:var(--body)}
-    .ghost:hover{background:rgba(255,255,255,.6)}
-    .avatar{display:flex;align-items:center;gap:10px;border:1px solid var(--glass-border);border-radius:var(--r-full);
-      padding:5px 6px 5px 14px;background:rgba(255,255,255,.5);cursor:pointer}
-    .avatar .bars{display:flex;flex-direction:column;gap:3px}
-    .avatar .bars i{display:block;width:14px;height:1.5px;background:var(--ink);border-radius:2px}
-    .avatar .dot{width:28px;height:28px;border-radius:var(--r-full);background:rgba(31,111,156,.28)}
-
-    /* ---------- hero + search ---------- */
-    .hero{padding:var(--s-xxl) 0 var(--s-base);text-align:center}
-    .hero h1{font-size:30px;font-weight:700;color:var(--ink);line-height:1.36;letter-spacing:-.4px}
-    .hero p{font-size:16px;color:var(--muted);margin-top:6px}
-
-    .search{display:flex;align-items:center;margin:var(--s-lg) auto 0;max-width:760px;
-      border-radius:var(--r-full);padding:6px 6px 6px 0;text-align:left;
-      background:var(--glass-strong);
-      backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-      border:1px solid var(--glass-border);box-shadow:var(--shadow-card)}
-    .seg{flex:1;padding:11px 22px;border-radius:var(--r-full);position:relative;min-width:0}
-    .seg + .seg::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:1px;background:var(--hairline)}
-    .seg .k{font-size:11px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:.02em}
-    .seg .v{font-size:15px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .seg input.v{width:100%;border:0;outline:none;background:transparent;padding:0;color:var(--ink)}
-    .seg input.v::placeholder{color:var(--muted-soft)}
-    .seg select.v{width:100%;border:0;outline:none;background:transparent;padding:0;color:var(--ink);
-      cursor:pointer;appearance:none;-webkit-appearance:none}
-    .seg-end{display:flex;align-items:center;gap:var(--s-sm);flex:0 0 auto;padding-left:var(--s-md)}
-    .orb{width:50px;height:50px;flex:0 0 50px;border-radius:var(--r-full);background:var(--primary);border:0;
-      display:grid;place-items:center;cursor:pointer;transition:background .15s,transform .15s;
-      box-shadow:0 4px 14px rgba(31,111,156,.35)}
-    .orb:hover{background:var(--primary-active);transform:scale(1.04)}
-    .orb svg{width:18px;height:18px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round}
-    .gpsmini{width:42px;height:42px;flex:0 0 42px;border-radius:var(--r-full);border:1px solid var(--glass-border);
-      background:rgba(255,255,255,.7);display:grid;place-items:center;cursor:pointer;color:var(--muted);transition:.15s}
-    .gpsmini:hover{color:var(--primary);border-color:var(--primary)}
-    .gpsmini.active{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
-    .gpsmini.busy{color:var(--primary);border-color:var(--primary)}
-    .gpsmini.busy svg{animation:spin 1.1s linear infinite}
-    .gpsmini svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none}
-
-    /* ---------- 地區快揀 ---------- */
-    .districts{display:flex;flex-wrap:wrap;gap:var(--s-sm);justify-content:center;margin-top:var(--s-md)}
-    .district{font-size:13px;font-weight:500;color:var(--body);cursor:pointer;
-      padding:7px 14px;border-radius:var(--r-full);
-      background:rgba(255,255,255,.42);border:1px solid var(--glass-border);
-      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:.15s}
-    .district:hover{background:rgba(255,255,255,.8);color:var(--ink)}
-
-    /* ---------- 位置狀態列 ---------- */
-    .locbar{display:flex;align-items:center;gap:10px;margin:var(--s-md) auto 0;
-      max-width:760px;padding:10px 12px 10px 16px;border-radius:var(--r-full);
-      background:var(--glass);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-      border:1px solid var(--glass-border);text-align:left;font-size:13.5px}
-    .locbar[hidden]{display:none}
-    .locdot{width:8px;height:8px;flex:0 0 8px;border-radius:var(--r-full);background:var(--muted-soft)}
-    .locdot.gps{background:#2f8f68}
-    .locdot.search,.locdot.map,.locdot.saved{background:var(--primary)}
-    .locdot.fallback,.locdot.none{background:#c0562f}
-    .loctext{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-    .loctext b{font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-    .locsrc{color:var(--muted);font-size:12.5px}
-    .locfix{flex:0 0 auto;border:1px solid var(--glass-border);background:rgba(255,255,255,.65);
-      color:var(--primary);font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:var(--r-full);cursor:pointer}
-    .locfix:hover{background:#fff}
-
-    /* ---------- 兩軸篩選：分段掣 + 滑桿 ---------- */
-    /* 貼住頂 —— 一路碌一路揀得，唔使碌返上去 */
-    .filters{position:sticky;top:76px;z-index:400;
-      margin:var(--s-base) 0 0;border-radius:var(--r-full);
-      padding:10px 12px;display:flex;align-items:center;gap:var(--s-lg)}
-
-    /* 食乜肉：分段掣 */
-    .seg-ctl{display:flex;flex:0 0 auto;background:rgba(255,255,255,.45);
-      border-radius:var(--r-full);padding:3px;gap:2px}
-    .seg-btn{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;
-      padding:7px 14px;border:0;border-radius:var(--r-full);background:transparent;transition:.15s}
-    .seg-btn:hover{color:var(--ink)}
-    .seg-btn.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(19,41,61,.14)}
-
-    /* 健康程度：真滑桿。呢個軸本身有次序（最健康→普通→快樂），所以用滑桿
-       比並列掣直觀 —— 拖右邊即係越放縱。刻度標籤本身可撳，唔使一定拖。 */
-    .slider-wrap{flex:1;min-width:150px;max-width:420px;padding:0 4px}
-    #healthRange{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
-      background:linear-gradient(90deg,#2f8f68,#1f6f9c 55%,#c0562f);outline:none;cursor:pointer}
-    #healthRange::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
-      background:#fff;border:2px solid var(--primary);cursor:grab;
-      box-shadow:0 2px 8px rgba(19,41,61,.28)}
-    #healthRange::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;
-      border:2px solid var(--primary);cursor:grab;box-shadow:0 2px 8px rgba(19,41,61,.28)}
-    .ticks{display:flex;justify-content:space-between;margin-top:5px}
-    .tick{font-size:11px;font-weight:500;color:var(--muted-soft);background:none;border:0;
-      cursor:pointer;padding:2px 4px;white-space:nowrap;transition:.15s}
-    .tick:hover{color:var(--ink)}
-    .tick.on{color:var(--primary);font-weight:700}
-
-    .more{flex:0 0 auto;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
-      background:none;border:1px solid var(--glass-border);border-radius:var(--r-full);padding:8px 14px}
-    .more:hover,.more.on{color:var(--primary);border-color:var(--primary)}
-
-    .more-panel{margin-top:var(--s-sm);border-radius:var(--r-lg);padding:var(--s-base);
-      display:flex;align-items:center;gap:var(--s-lg);flex-wrap:wrap}
-    .more-panel[hidden]{display:none}
-    .risky{display:flex;align-items:center;gap:7px;font-size:12.5px;
-      color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none}
-    .risky input{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
-    .risky:hover{color:var(--ink)}
-    .redo{margin-left:auto;font-size:13px;font-weight:600;color:var(--primary);cursor:pointer;
-      background:none;border:0;padding:8px 4px;white-space:nowrap}
-    .redo:hover{text-decoration:underline}
-
-    /* ---------- split: list + map ---------- */
-    /* minmax(0,1fr) 唔可以少 —— 淨係寫 1fr 等於 minmax(auto,1fr)，
-       左欄啲卡片內容會撐爆佢，把地圖擠到剩 33px 闊，
-       fitBounds 就會 zoom 到成個廣東省。 */
-    .split{display:grid;grid-template-columns:minmax(0,1fr) 44%;gap:var(--s-xl);padding:var(--s-lg) 0 var(--s-section)}
-    .count{font-size:14px;color:var(--body);margin-bottom:var(--s-base);display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-    .count b{font-weight:700;color:var(--ink);font-size:15px}
-    .count .sep{color:var(--muted-soft)}
-    .count .radius{color:var(--muted)}
-    .dataset-note{font-size:12px;color:var(--muted-soft);margin:-10px 0 var(--s-base)}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-base)}
-
-    /* ---------- card ---------- */
-    .card{cursor:pointer;min-width:0;border-radius:var(--r-lg);overflow:hidden;
-      background:var(--glass);
-      backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-      border:1px solid var(--glass-border);box-shadow:var(--shadow-glass);
-      transition:transform .2s,box-shadow .2s,background .2s}
-    .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);background:var(--glass-strong)}
-    .card.selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-soft),var(--shadow-lift)}
-    .photo{position:relative;aspect-ratio:2/1;overflow:hidden;display:grid;place-items:center;
-      background:rgba(255,255,255,.3)}
-    /* 真相／示意圖：載唔到就自動除咗佢，露返下面個底字。
-       故意唔用 opacity 淡入 —— 背景 tab 嘅 transition 會凍住，張相就永遠唔現形。 */
-    .ph-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-    .ph-glyph{font-size:clamp(34px,4.6vw,52px);font-weight:600;line-height:1;letter-spacing:.06em;
-      color:rgba(19,41,61,.2);user-select:none;pointer-events:none}
-    .tone-chicken{background:linear-gradient(150deg,#dfe9f2,#c6d8e8)}
-    .tone-beef{background:linear-gradient(150deg,#e2e3ee,#c8cfe2)}
-    .tone-none{background:linear-gradient(150deg,#dcebe6,#c3dcd8)}
-    .tone-other{background:linear-gradient(150deg,#e0e8f0,#c9d7e4)}
-    .badge{position:absolute;top:10px;left:10px;z-index:2;font-size:10.5px;font-weight:600;
-      padding:5px 9px;border-radius:var(--r-full);color:var(--ink);
-      background:rgba(255,255,255,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-      box-shadow:0 2px 8px rgba(19,41,61,.14)}
-    .badge.stock{color:var(--muted);font-weight:500}
-    .badge.warn{background:rgba(190,110,40,.9);color:#fff}
-    .badge.bottom{top:auto;bottom:10px}
-    .go{position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;border-radius:var(--r-full);
-      background:rgba(255,255,255,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-      display:grid;place-items:center;box-shadow:0 2px 8px rgba(19,41,61,.16);
-      color:var(--ink);text-decoration:none;opacity:0;transition:opacity .15s,background .15s}
-    .card:hover .go,.go:focus-visible{opacity:1}
-    .go:hover{background:#fff}
-    .go svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-    @media (hover:none){.go{opacity:1}}
-
-    .cbody{padding:var(--s-base);position:relative}
-    .go.inline{position:absolute;top:12px;right:12px;opacity:1;width:28px;height:28px;
-      background:rgba(255,255,255,.7);box-shadow:none;border:1px solid var(--glass-border)}
-    .row{padding-right:34px}
-    /* 行路消耗：距離唔再淨係「幾遠」，而係「已經燒咗幾多」 */
-    .walk{display:flex;align-items:center;gap:5px;margin-top:6px;
-      font-size:12px;font-weight:600;color:var(--primary)}
-    .walk svg{width:13px;height:13px;flex:0 0 13px;stroke:currentColor;stroke-width:1.8;
-      fill:none;stroke-linecap:round;stroke-linejoin:round}
-    .weight{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted);
-      white-space:nowrap}
-    .weight input{width:52px;padding:5px 7px;border-radius:var(--r-sm);
-      border:1px solid var(--glass-border);background:rgba(255,255,255,.7);
-      color:var(--ink);text-align:center;font-weight:600}
-    .why{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:7px;
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .mini-tag.pick{background:rgba(31,111,156,.14);color:var(--primary)}
-    .mini-tag.warn{background:rgba(190,110,40,.14);color:#95571c}
-    .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-    .name{font-size:15.5px;font-weight:600;color:var(--ink);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .rate{font-size:13.5px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
-    .rate svg{width:11px;height:11px;fill:var(--muted)}
-    .meta{font-size:13px;color:var(--muted);line-height:1.45;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-    .mini-tag{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:var(--r-full);
-      background:rgba(31,111,156,.1);color:var(--primary)}
-    .mini-tag.h-best{background:rgba(38,124,94,.12);color:#1f6b50}
-    .mini-tag.h-normal{background:rgba(31,111,156,.1);color:var(--primary)}
-    .mini-tag.h-happy{background:rgba(190,110,40,.14);color:#95571c}
-    .mini-tag.meat{background:rgba(19,41,61,.07);color:var(--body)}
-
-    /* ---------- empty / warning ---------- */
-    .empty-state{grid-column:1/-1;text-align:center;padding:var(--s-xxl) var(--s-base);color:var(--muted);
-      border-radius:var(--r-lg);background:var(--glass-quiet);border:1px solid var(--glass-border)}
-    .empty-state .icon{width:46px;height:46px;margin:0 auto var(--s-base);border-radius:var(--r-full);
-      background:rgba(255,255,255,.7);display:grid;place-items:center}
-    .empty-state .icon svg{width:21px;height:21px;stroke:var(--primary);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-    .empty-state p{font-size:15px;line-height:1.75}
-    .skeleton{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-base)}
-    .skeleton i{display:block;aspect-ratio:3/2;border-radius:var(--r-lg);background:var(--glass-quiet);
-      border:1px solid var(--glass-border);animation:pulse 1.3s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
-    #dataWarningBanner{grid-column:1/-1}
-    .btn-retry{margin-top:var(--s-md);padding:11px 20px;border:0;border-radius:var(--r-full);
-      background:var(--primary);color:var(--on-primary);font-size:14px;font-weight:600;cursor:pointer}
-    .btn-retry:hover{background:var(--primary-active)}
-
-    /* ---------- map ---------- */
-    /* isolation：困住 Leaflet 自己嗰堆 z-index，唔好爬到彈窗上面 */
-    .mapwrap{position:sticky;top:100px;height:calc(100vh - 132px);border-radius:var(--r-lg);overflow:hidden;
-      isolation:isolate;border:1px solid var(--glass-border);box-shadow:var(--shadow-card);background:#dce8f2}
-    #map{position:absolute;inset:0;background:#dce8f2}
-    .leaflet-container{font:inherit}
-    .pin-wrap{width:auto!important;height:auto!important}
-    .pin{display:inline-block;transform:translate(-50%,-50%);color:var(--ink);
-      font-size:12.5px;font-weight:600;padding:7px 11px;border-radius:var(--r-full);
-      background:rgba(255,255,255,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-      border:1px solid rgba(255,255,255,.8);
-      box-shadow:0 3px 10px rgba(19,41,61,.28);cursor:pointer;white-space:nowrap;transition:transform .12s,background .12s}
-    .pin:hover{transform:translate(-50%,-50%) scale(1.06);z-index:3}
-    .pin.on{background:var(--primary);color:#fff;border-color:var(--primary);z-index:2}
-    .pin.highlight{background:var(--primary);color:#fff;border-color:var(--primary)}
-    /* 結果多過 COMPACT_PIN_THRESHOLD 就縮做細點 —— 幾十個藥丸疊埋一齊乜都睇唔到。
-       hover 或者揀中嗰個先展開返個距離標籤。 */
-    .pin.compact{width:13px;height:13px;padding:0;border-radius:var(--r-full);
-      background:#fff;box-shadow:0 0 0 2.5px var(--primary),0 1px 5px rgba(19,41,61,.3)}
-    .pin.compact .pin-label{display:none}
-    .pin.compact:hover,.pin.compact.on,.pin.compact.highlight{
-      width:auto;height:auto;padding:7px 11px;box-shadow:0 3px 10px rgba(19,41,61,.28)}
-    .pin.compact:hover .pin-label,.pin.compact.on .pin-label,.pin.compact.highlight .pin-label{display:inline}
-    .me{width:14px;height:14px;border-radius:var(--r-full);background:var(--primary);
-      border:3px solid #fff;box-shadow:0 0 0 1px rgba(19,41,61,.14),0 2px 6px rgba(19,41,61,.3)}
-    .maptools{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:8px;z-index:500}
-    .maptool{width:38px;height:38px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.7);
-      background:rgba(255,255,255,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      box-shadow:0 3px 10px rgba(19,41,61,.18);display:grid;place-items:center;font-size:17px;color:var(--ink);cursor:pointer}
-    .maptool:hover{background:#fff}
-    .mapchip{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:500;
-      border:1px solid rgba(255,255,255,.5);
-      background:rgba(19,41,61,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      color:#fff;font-size:13.5px;font-weight:500;padding:11px 18px;
-      border-radius:var(--r-full);box-shadow:0 6px 20px rgba(19,41,61,.3);cursor:pointer;white-space:nowrap}
-    .mapchip:hover{background:rgba(19,41,61,.94)}
-    .leaflet-popup-content-wrapper{border-radius:var(--r-md);box-shadow:var(--shadow-card);
-      background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-    .leaflet-popup-content{margin:14px 16px;font-family:inherit}
-    .leaflet-popup-tip{background:rgba(255,255,255,.9)}
-    .popup-name{font-size:15px;font-weight:600;color:var(--ink)}
-    .popup-addr{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
-    .popup-nav{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;color:var(--primary);text-decoration:none}
-    .popup-nav:hover{text-decoration:underline}
-
-    /* ---------- location toast + loading ---------- */
-    .location-toast{position:fixed;left:var(--s-lg);bottom:var(--s-lg);z-index:700;display:flex;align-items:center;gap:9px;
-      border-radius:var(--r-full);padding:11px 17px;font-size:13px;color:var(--body);
-      background:var(--glass-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-      border:1px solid var(--glass-border);box-shadow:var(--shadow-card);
-      max-width:min(440px,calc(100vw - 48px));transition:opacity .25s,transform .25s}
-    .location-toast .dot{width:8px;height:8px;border-radius:var(--r-full);background:var(--muted-soft);flex:0 0 8px}
-    .location-toast .dot.located{background:#2f8f68}
-    .location-toast .dot.error{background:#c0562f}
-    .location-toast .dot.locating{animation:pulse 1.1s ease-in-out infinite}
-    .location-toast span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .location-toast.hidden{opacity:0;transform:translateY(8px);pointer-events:none}
-    .loading-overlay{position:fixed;left:50%;bottom:var(--s-lg);transform:translateX(-50%);z-index:700;
-      display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:var(--r-full);
-      background:rgba(19,41,61,.84);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-      color:#fff;box-shadow:var(--shadow-card);font-size:14px;transition:opacity .25s}
-    .loading-overlay.hidden{opacity:0;pointer-events:none}
-    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
-      border-radius:var(--r-full);animation:spin .8s linear infinite}
+    /* ---------- 品牌欄 ---------- */
+    .topbar{background:var(--brand);position:sticky;top:0;z-index:600}
+    .topbar .wrap{display:flex;align-items:center;gap:var(--s-4);height:var(--head-h)}
+    .logo{display:flex;align-items:baseline;gap:7px;color:#fff;font-weight:800;
+      font-size:20px;letter-spacing:-.4px;white-space:nowrap}
+    .logo em{font-style:normal;font-size:12px;font-weight:600;opacity:.85}
+    .searchbox{flex:1;max-width:560px;display:flex;align-items:center;gap:0;
+      background:#fff;border-radius:var(--r-md);overflow:hidden;height:36px}
+    .searchbox svg{width:16px;height:16px;margin:0 8px 0 11px;flex:0 0 16px;
+      stroke:var(--muted);stroke-width:2;fill:none}
+    .searchbox input{flex:1;min-width:0;border:0;outline:none;font-size:14px;color:var(--ink);padding:0}
+    .searchbox button{border:0;background:var(--brand-dark);color:#fff;font-size:14px;
+      font-weight:700;padding:0 16px;height:100%;cursor:pointer}
+    .top-actions{display:flex;align-items:center;gap:var(--s-2);margin-left:auto}
+    .ghost-btn{border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;
+      border-radius:var(--r-md);height:34px;padding:0 12px;font-size:13px;font-weight:600;
+      cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+    .ghost-btn:hover{background:rgba(255,255,255,.14)}
+    .ghost-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
+    .ghost-btn.active{background:#fff;color:var(--brand-dark);border-color:#fff}
+    .ghost-btn.busy svg{animation:spin 1.1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ---------- detail modal ---------- */
-    .detail-overlay{position:fixed;inset:0;background:rgba(19,41,61,.38);backdrop-filter:blur(3px);
-      z-index:800;opacity:0;pointer-events:none;transition:opacity .2s}
+    /* ---------- 頁頭：地名 + 分類頁籤 ---------- */
+    .pagehead{background:var(--paper);border-bottom:1px solid var(--line)}
+    .pagehead .wrap{padding-top:var(--s-4)}
+    .h1row{display:flex;align-items:baseline;gap:var(--s-3);flex-wrap:wrap}
+    .h1row h1{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.5px}
+    .crumb{font-size:12px;color:var(--faint)}
+    .tabs{display:flex;gap:var(--s-5);margin-top:var(--s-4);overflow-x:auto;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{position:relative;background:none;border:0;cursor:pointer;padding:0 0 11px;
+      font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap}
+    .tab:hover{color:var(--ink)}
+    .tab.on{color:var(--brand-ink)}
+    .tab.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+      background:var(--brand);border-radius:2px 2px 0 0}
+
+    /* ---------- 三欄：篩選 / 名單 ---------- */
+    .main{display:grid;grid-template-columns:236px minmax(0,1fr);gap:var(--s-5);
+      padding-top:var(--s-5);padding-bottom:var(--s-7);align-items:start}
+    .side{position:sticky;top:calc(var(--head-h) + var(--s-3));display:flex;
+      flex-direction:column;gap:var(--s-3)}
+    .panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);
+      overflow:hidden}
+    .panel h3{font-size:13px;font-weight:800;color:var(--ink);padding:12px var(--s-4) 0}
+    .panel .pbody{padding:var(--s-3) var(--s-4) var(--s-4)}
+    .mapwrap{height:180px;position:relative;border-radius:var(--r-lg);overflow:hidden;
+      border:1px solid var(--line);isolation:isolate;background:#e8eaed}
+    #map{position:absolute;inset:0}
+    .mapwrap .maplabel{position:absolute;left:0;right:0;bottom:0;z-index:500;
+      background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;
+      padding:7px;text-align:center;cursor:pointer}
+    .maptools,.mapchip{display:none}
+
+    .side select,.side input[type=number]{width:100%;padding:7px 9px;border:1px solid var(--line);
+      border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font-size:13px}
+    .districts{display:flex;flex-wrap:wrap;gap:5px}
+    .district{font-size:12px;color:var(--body);cursor:pointer;padding:5px 10px;
+      border-radius:var(--r-full);background:var(--field);border:1px solid transparent}
+    .district:hover{border-color:var(--brand);color:var(--brand-ink);background:var(--brand-tint)}
+    .opt{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--body);
+      cursor:pointer;padding:5px 0}
+    .opt input{accent-color:var(--brand);width:14px;height:14px;cursor:pointer}
+    .wrow{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+    .wrow input{width:64px;text-align:center;font-weight:700}
+    .side .redo{width:100%;margin-top:var(--s-2);padding:8px;border:1px solid var(--brand);
+      background:var(--brand-tint);color:var(--brand-ink);border-radius:var(--r-sm);
+      font-size:13px;font-weight:700;cursor:pointer}
+
+    /* ---------- 結果頭 ---------- */
+    .resulthead{display:flex;align-items:center;gap:var(--s-2);flex-wrap:wrap;margin-bottom:var(--s-3)}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:var(--paper);
+      border:1px solid var(--brand);color:var(--brand-ink);border-radius:var(--r-sm);
+      padding:5px 10px;font-size:12.5px;font-weight:600}
+    .chip button{border:0;background:none;color:var(--brand-ink);cursor:pointer;font-size:13px;line-height:1}
+    .reset{border:1px solid var(--line);background:var(--paper);color:var(--muted);
+      border-radius:var(--r-sm);padding:5px 12px;font-size:12.5px;cursor:pointer}
+    .count{margin-left:auto;font-size:13px;color:var(--muted)}
+    .count b{color:var(--ink);font-weight:800}
+    .notice{width:100%;font-size:12.5px;color:var(--warn);background:var(--warn-tint);
+      border:1px solid #f0dcc6;border-radius:var(--r-md);padding:8px 11px;line-height:1.5}
+    .notice[hidden]{display:none}
+
+    /* ---------- 橫列式名單（OpenRice 骨架）---------- */
+    .rows{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+    .card{display:grid;grid-template-columns:96px minmax(0,1fr) 40px;gap:var(--s-4);
+      padding:var(--s-4);border-bottom:1px solid var(--line-soft);cursor:pointer;
+      transition:background .12s;align-items:start}
+    .card:last-child{border-bottom:0}
+    .card:hover{background:#fafafa}
+    .card.selected{background:var(--brand-tint)}
+    /* 相位擺唔到真相，就用距離做主視覺 —— 呢格係卡片入面最先睇到嘅嘢 */
+    .thumb{height:76px;border-radius:var(--r-md);display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:1px;color:#fff;background:var(--brand)}
+    .thumb .d{font-size:24px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1}
+    .thumb .u{font-size:10px;font-weight:700;opacity:.85;letter-spacing:.08em}
+    .thumb.far{background:#8aa0ad}
+    .thumb.mid{background:#3f8f6b}
+    .name{font-size:16px;font-weight:800;color:var(--ink);line-height:1.3;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .addr{font-size:12.5px;color:var(--muted);margin-top:3px;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .metaline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:6px;font-size:12.5px;color:var(--muted)}
+    .metaline .sep{color:var(--line)}
+    .metaline .kind{color:var(--brand-ink);font-weight:700}
+    .metaline .walk{color:var(--body);font-weight:600}
+    .why{font-size:12.5px;color:var(--body);line-height:1.55;margin-top:7px;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+    .mini-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--r-sm);
+      background:var(--field);color:var(--muted)}
+    .mini-tag.h-best{background:var(--brand-tint);color:var(--brand-ink)}
+    .mini-tag.h-happy{background:var(--warn-tint);color:var(--warn)}
+    .mini-tag.pick{background:#fff4d6;color:#8a6300}
+    .mini-tag.warn{background:var(--warn-tint);color:var(--warn)}
+    .rowact{display:flex;flex-direction:column;align-items:center;gap:var(--s-3)}
+    .fav,.go{width:32px;height:32px;border-radius:var(--r-full);border:1px solid var(--line);
+      background:var(--paper);display:grid;place-items:center;cursor:pointer;color:var(--faint)}
+    .fav:hover,.go:hover{border-color:var(--brand);color:var(--brand)}
+    .fav.on{background:var(--brand-tint);border-color:var(--brand);color:var(--brand)}
+    .fav svg,.go svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;
+      stroke-linecap:round;stroke-linejoin:round}
+    .fav.on svg{fill:currentColor}
+
+    .skeleton{padding:var(--s-4)}
+    .skeleton i{display:block;height:76px;border-radius:var(--r-md);background:var(--field);
+      margin-bottom:var(--s-3);animation:pulse 1.3s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+    .empty-state{padding:var(--s-7) var(--s-4);text-align:center;color:var(--muted)}
+    .empty-state .icon{width:44px;height:44px;margin:0 auto var(--s-3);border-radius:var(--r-full);
+      background:var(--field);display:grid;place-items:center}
+    .empty-state .icon svg{width:20px;height:20px;stroke:var(--brand);stroke-width:1.8;fill:none;
+      stroke-linecap:round;stroke-linejoin:round}
+    .empty-state p{font-size:14px;line-height:1.7}
+    .btn-retry{margin-top:var(--s-3);padding:9px 18px;border:0;border-radius:var(--r-sm);
+      background:var(--brand);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer}
+    #dataWarningBanner{margin:var(--s-3)}
+    .dataset-note{font-size:11.5px;color:var(--faint);margin-top:var(--s-3);text-align:center}
+
+    /* ---------- 地圖標記 ---------- */
+    .leaflet-container{font:inherit}
+    .pin-wrap{width:auto!important;height:auto!important}
+    .pin{display:inline-block;transform:translate(-50%,-50%);color:#fff;background:var(--brand);
+      font-size:11px;font-weight:700;padding:3px 7px;border-radius:var(--r-sm);
+      font-variant-numeric:tabular-nums;box-shadow:0 1px 4px rgba(0,0,0,.3);
+      cursor:pointer;white-space:nowrap;transition:.12s}
+    .pin:hover{transform:translate(-50%,-50%) scale(1.1);z-index:3}
+    .pin.on,.pin.highlight{background:var(--ink)}
+    .pin.compact{width:9px;height:9px;padding:0;border-radius:var(--r-full);
+      background:var(--brand);box-shadow:0 0 0 1.5px #fff,0 1px 3px rgba(0,0,0,.35)}
+    .pin.compact .pin-label{display:none}
+    .pin.compact:hover,.pin.compact.on,.pin.compact.highlight{width:auto;height:auto;padding:3px 7px;border-radius:var(--r-sm)}
+    .pin.compact:hover .pin-label,.pin.compact.on .pin-label,.pin.compact.highlight .pin-label{display:inline}
+    .me{width:11px;height:11px;border-radius:var(--r-full);background:#d93025;border:2px solid #fff;
+      box-shadow:0 1px 4px rgba(0,0,0,.4)}
+    .leaflet-popup-content-wrapper{border-radius:var(--r-md)}
+    .leaflet-popup-content{margin:11px 13px;font-family:inherit}
+    .popup-name{font-size:14px;font-weight:800;color:var(--ink)}
+    .popup-addr{font-size:12px;color:var(--muted);margin-top:2px}
+    .popup-nav{display:inline-block;margin-top:7px;font-size:12px;font-weight:700;color:var(--brand-ink)}
+
+    /* ---------- 詳情 ---------- */
+    .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:800;
+      opacity:0;pointer-events:none;transition:opacity .18s}
     .detail-overlay.active{opacity:1;pointer-events:auto}
-    .detail-sheet{position:fixed;z-index:900;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);
-      width:min(560px,calc(100vw - 48px));max-height:min(82vh,760px);display:flex;flex-direction:column;
-      border-radius:var(--r-lg);overflow:hidden;
-      background:rgba(255,255,255,.82);backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);
-      border:1px solid var(--glass-border);box-shadow:0 24px 60px rgba(19,41,61,.3);
-      opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
-    .detail-sheet.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-    .detail-top{display:flex;align-items:flex-start;gap:var(--s-base);padding:var(--s-lg) var(--s-lg) var(--s-base);
-      border-bottom:1px solid var(--hairline-soft)}
-    .detail-name{font-size:20px;font-weight:700;color:var(--ink);line-height:1.3}
-    .detail-name-en{font-size:14px;color:var(--muted);margin-top:2px}
-    .detail-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .detail-close{margin-left:auto;width:32px;height:32px;flex:0 0 32px;border:0;border-radius:var(--r-full);
-      background:rgba(19,41,61,.08);color:var(--ink);font-size:13px;cursor:pointer;display:grid;place-items:center}
-    .detail-close:hover{background:rgba(19,41,61,.16)}
-    .detail-body{padding:var(--s-base) var(--s-lg) var(--s-lg);overflow-y:auto}
-    .detail-photo{position:relative;aspect-ratio:16/9;border-radius:var(--r-md);overflow:hidden;
-      background:rgba(255,255,255,.4);margin-bottom:var(--s-base)}
+    .detail-sheet{position:fixed;z-index:900;left:50%;top:50%;transform:translate(-50%,-46%);
+      width:min(540px,calc(100vw - 32px));max-height:84vh;display:flex;flex-direction:column;
+      background:var(--paper);border-radius:var(--r-lg);overflow:hidden;
+      box-shadow:0 16px 48px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:.18s}
+    .detail-sheet.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+    .detail-top{display:flex;align-items:flex-start;gap:var(--s-3);
+      padding:var(--s-5) var(--s-5) var(--s-3);border-bottom:1px solid var(--line)}
+    .detail-name{font-size:19px;font-weight:800;color:var(--ink);line-height:1.3}
+    .detail-name-en{font-size:13px;color:var(--muted);margin-top:2px}
+    .detail-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+    .detail-close{margin-left:auto;width:30px;height:30px;flex:0 0 30px;border:0;
+      border-radius:var(--r-full);background:var(--field);color:var(--ink);cursor:pointer;font-size:12px}
+    .detail-body{padding:var(--s-4) var(--s-5) var(--s-5);overflow-y:auto}
+    .detail-photo{aspect-ratio:16/9;border-radius:var(--r-md);overflow:hidden;background:var(--field);margin-bottom:var(--s-4)}
     .detail-photo img{width:100%;height:100%;object-fit:cover;display:block}
-    .detail-photo .badge{top:10px;left:10px}
-    .trust-warn{font-size:13px;line-height:1.7;color:#8a4a18;background:rgba(190,110,40,.12);
-      border:1px solid rgba(190,110,40,.28);border-radius:var(--r-md);
-      padding:12px var(--s-base);margin-bottom:var(--s-base)}
-    .detail-desc{font-size:14px;line-height:1.75;color:var(--body);
-      background:rgba(255,255,255,.5);border:1px solid var(--glass-border);
-      border-radius:var(--r-md);padding:var(--s-base)}
-    .detail-info-grid{margin-top:var(--s-base)}
-    .info-row{display:flex;gap:var(--s-base);padding:11px 0;border-bottom:1px solid var(--hairline-soft);font-size:14px}
+    .trust-warn{font-size:12.5px;line-height:1.6;color:var(--warn);background:var(--warn-tint);
+      border:1px solid #f0dcc6;border-radius:var(--r-md);padding:10px 13px;margin-bottom:var(--s-4)}
+    .detail-desc{font-size:13.5px;line-height:1.75;color:var(--body);background:var(--field);
+      border-radius:var(--r-md);padding:var(--s-4)}
+    .detail-info-grid{margin-top:var(--s-4)}
+    .info-row{display:flex;gap:var(--s-4);padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:13.5px}
     .info-row:last-child{border-bottom:0}
-    .info-label{flex:0 0 60px;color:var(--muted)}
+    .info-label{flex:0 0 56px;color:var(--muted)}
     .info-value{color:var(--ink);word-break:break-word}
-    .info-value a{color:var(--primary);text-decoration:none}
-    .info-value a:hover{text-decoration:underline}
-    .detail-hours{margin-top:var(--s-base)}
-    .detail-hours h4{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
-    .detail-hours p{font-size:13px;color:var(--muted);line-height:1.7}
-    .detail-actions{display:flex;gap:var(--s-md);margin-top:var(--s-lg)}
-    .btn-primary,.btn-outline{flex:1;text-align:center;padding:14px 16px;border-radius:var(--r-sm);
-      font-size:15px;font-weight:600;text-decoration:none}
-    .btn-primary{background:var(--primary);color:var(--on-primary)}
-    .btn-primary:hover{background:var(--primary-active)}
-    .btn-outline{border:1px solid var(--border-strong);color:var(--ink);background:rgba(255,255,255,.5)}
-    .btn-outline:hover{background:#fff}
+    .info-value a{color:var(--brand-ink);font-weight:600}
+    .detail-hours{margin-top:var(--s-4)}
+    .detail-hours h4{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:5px}
+    .detail-hours p{font-size:12.5px;color:var(--muted);line-height:1.7}
+    .detail-actions{display:flex;gap:var(--s-3);margin-top:var(--s-5)}
+    .btn-primary,.btn-outline{flex:1;text-align:center;padding:12px;border-radius:var(--r-sm);
+      font-size:14px;font-weight:700}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-outline{border:1px solid var(--line);color:var(--ink)}
+
+    /* ---------- 提示 ---------- */
+    .location-toast,.loading-overlay{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;
+      z-index:700;display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:var(--r-md);
+      font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.18);max-width:calc(100vw - 32px);transition:opacity .25s}
+    .location-toast{background:var(--paper);border:1px solid var(--line);color:var(--body)}
+    .location-toast .dot{width:7px;height:7px;border-radius:var(--r-full);background:var(--faint);flex:0 0 7px}
+    .location-toast .dot.located{background:var(--brand)}
+    .location-toast .dot.error{background:var(--warn)}
+    .location-toast span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .loading-overlay{background:var(--ink);color:#fff}
+    .location-toast.hidden,.loading-overlay.hidden{opacity:0;pointer-events:none}
+    .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+      border-radius:var(--r-full);animation:spin .8s linear infinite}
 
     /* ---------- footer ---------- */
-    footer{border-top:1px solid var(--glass-border);
-      background:rgba(255,255,255,.4);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
-    .fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-xl);padding:var(--s-xxl) 0}
-    .fgrid h4{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:var(--s-md)}
-    .fgrid a,.fgrid p{display:block;font-size:13.5px;color:var(--muted);text-decoration:none;line-height:1.9}
-    .fgrid a:hover{text-decoration:underline;color:var(--ink)}
-    .legal{border-top:1px solid var(--hairline-soft);padding:var(--s-lg) 0;display:flex;justify-content:space-between;
-      font-size:13px;color:var(--muted);flex-wrap:wrap;gap:var(--s-md)}
+    footer{background:var(--paper);border-top:1px solid var(--line)}
+    .fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-5);padding:var(--s-6) 0}
+    .fgrid h4{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:var(--s-2)}
+    .fgrid a,.fgrid p{display:block;font-size:12.5px;color:var(--muted);line-height:1.85}
+    .fgrid a:hover{color:var(--brand-ink)}
+    .legal{border-top:1px solid var(--line-soft);padding:var(--s-4) 0;display:flex;
+      justify-content:space-between;font-size:12px;color:var(--faint);flex-wrap:wrap;gap:var(--s-3)}
 
-    :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:var(--r-xs)}
-
-    /* ---------- responsive ---------- */
-    @media(max-width:1000px){
-      .split{grid-template-columns:1fr}
-      .mapwrap{height:400px;position:relative;top:0;order:-1}
-      .tabs{display:none}
-    }
-    @media(max-width:760px){
-      .wrap{padding:0 var(--s-base)}
-      .nav{height:62px}
-      .nav-right .ghost{display:none}
-      .hero{padding:var(--s-lg) 0 var(--s-sm)}
-      .hero h1{font-size:23px}
-      .hero p{font-size:14px}
-      .search{flex-wrap:wrap;border-radius:var(--r-lg);padding:6px}
-      .seg{flex:1 1 100%;padding:10px 14px}
-      .seg + .seg::before{display:none}
-      .seg + .seg{border-top:1px solid var(--hairline-soft)}
-      .seg-end{flex:1 1 100%;justify-content:flex-end;padding:6px 6px 6px 14px;border-top:1px solid var(--hairline-soft)}
-      .filters{padding:var(--s-base);gap:var(--s-md);flex-direction:column;align-items:stretch}
-      .axis{align-items:flex-start;flex-direction:column;gap:7px}
-      .risky{display:flex;align-items:center;gap:7px;margin-left:auto;font-size:12.5px;
-      color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none}
-    .risky input{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
-    .risky:hover{color:var(--ink)}
-    .filters .redo{margin-left:var(--s-base);margin-left:0;align-self:flex-start}
-      .grid,.skeleton{grid-template-columns:1fr}
-      .fgrid{grid-template-columns:repeat(2,1fr);gap:var(--s-lg)}
-      .detail-sheet{left:0;top:auto;bottom:0;transform:translateY(12px);width:100%;max-height:88vh;
-        border-radius:var(--r-lg) var(--r-lg) 0 0}
+    /* ---------- 手機 ---------- */
+    @media(max-width:900px){
+      .main{grid-template-columns:1fr;padding-top:var(--s-3)}
+      .side{position:static;order:2}
+      .mapwrap{height:220px}
+      .searchbox{max-width:none}
+      .logo em{display:none}
+      .card{grid-template-columns:64px minmax(0,1fr) 34px;gap:var(--s-3);padding:var(--s-3)}
+      .thumb{height:60px}
+      .thumb .d{font-size:19px}
+      .h1row h1{font-size:20px}
+      .detail-sheet{left:0;top:auto;bottom:0;transform:translateY(14px);width:100%;
+        max-height:90vh;border-radius:var(--r-lg) var(--r-lg) 0 0}
       .detail-sheet.active{transform:translateY(0)}
+      .fgrid{grid-template-columns:repeat(2,1fr)}
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap nav">
-    <div class="logo"><span class="mark"></span>FitFood Map</div>
-    <div class="tabs">
-      <button class="tab active">附近搵食</button>
-      <button class="tab">連鎖店<span class="new">new</span></button>
-      <button class="tab">關於分類</button>
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo">FitFood <em>健身搵食</em></div>
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+      <input type="text" id="locationInput" placeholder="地區、地址…例如 紅磡、觀塘"
+             onkeydown="if(event.key==='Enter')searchLocation()">
+      <button onclick="searchLocation()">搵</button>
     </div>
-    <div class="nav-right">
-      <button class="ghost">香港</button>
-      <button class="ghost">繁體中文</button>
-      <div class="avatar"><div class="bars"><i></i><i></i><i></i></div><div class="dot"></div></div>
+    <div class="top-actions">
+      <button class="ghost-btn" id="gpsBtn" onclick="useGPS()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>
+        我嘅位置
+      </button>
+      <button class="ghost-btn" id="favBtn" onclick="toggleFavOnly()">
+        <svg viewBox="0 0 24 24"><path d="M12 17.3 6.2 20.6l1.4-6.5L2.7 9.7l6.6-.7L12 3l2.7 6 6.6.7-4.9 4.4 1.4 6.5z"/></svg>
+        收藏
+      </button>
     </div>
   </div>
 </header>
 
-<div class="wrap hero">
-  <h1>搵附近食得健康嘅嘢</h1>
-  <p>揀食乜肉、揀幾健康 —— 睇住地圖揀</p>
-  <div class="search">
-    <div class="seg">
-      <div class="k">地點</div>
-      <input class="v" type="text" id="locationInput" placeholder="觀塘、旺角、銅鑼灣…"
-             onkeydown="if(event.key==='Enter')searchLocation()">
+<div class="pagehead">
+  <div class="wrap">
+    <div class="h1row">
+      <h1 id="locBarWhere">搵緊你嘅位置…</h1>
+      <span class="crumb">健身搵食 › 香港 › <span id="crumbArea">—</span></span>
     </div>
-    <div class="seg">
-      <div class="k">範圍</div>
-      <select class="v" id="radiusSelect" onchange="setRadiusMode(this.value)">
-        <option value="auto">3km 內全部（預設）</option>
-        <option value="500">500m 內</option>
-        <option value="800">800m 內</option>
-        <option value="1500">1.5km 內</option>
-      </select>
-    </div>
-    <div class="seg-end">
-      <button class="gpsmini" id="gpsBtn" onclick="useGPS()" title="用我嘅位置" aria-label="用我嘅位置">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>
-      </button>
-      <button class="orb" onclick="searchLocation()" title="搜尋" aria-label="搜尋">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
-      </button>
-    </div>
-  </div>
-  <div class="districts" id="districts"></div>
-
-  <!-- 一直見到嘅位置狀態列。以前只有個會自動消失嘅 toast，
-       用戶根本唔知而家搵緊邊度、個位置係邊度嚟 —— 呢個就係「定位錯咗都唔知」嘅來源。 -->
-  <div class="locbar" id="locBar" hidden>
-    <span class="locdot" id="locBarDot"></span>
-    <span class="loctext">
-      <b id="locBarWhere"></b>
-      <span class="locsrc" id="locBarSource"></span>
-    </span>
-    <button class="locfix" onclick="useGPS()">用我嘅位置</button>
+    <nav class="tabs" id="healthTicks"></nav>
   </div>
 </div>
 
-<div class="wrap">
-  <div class="filters glass" id="filterBar">
-    <div class="slider-wrap wide">
-      <input type="range" id="healthRange" min="0" max="3" step="1" value="3"
-             oninput="setCatByIndex(this.value)" aria-label="類別">
-      <div class="ticks" id="healthTicks"></div>
-    </div>
-
-    <button class="more" id="moreBtn" onclick="toggleMore()" aria-expanded="false">更多</button>
-  </div>
-
-  <div class="more-panel glass" id="morePanel" hidden>
-    <label class="risky">
-      <input type="checkbox" id="includeOsmBox" onchange="setIncludeOsm(this.checked)">
-      <span>連埋街坊餐廳（OSM 6,297 間）</span>
-    </label>
-    <label class="risky" id="staleWrap" style="display:none">
-      <input type="checkbox" id="hideStaleBox" checked onchange="setHideStale(this.checked)">
-      <span>隱藏 6 年冇更新嘅記錄</span>
-    </label>
-    <label class="weight" title="用嚟計行路消耗">
-      <span>體重</span>
-      <input type="number" id="weightInput" min="30" max="200" step="1"
-             onchange="setWeight(this.value)" aria-label="體重（公斤）">
-      <span>kg</span>
-    </label>
-    <button class="redo" onclick="searchNearby()">重新搜尋</button>
-  </div>
-
-  <div class="split">
-    <div>
-      <div class="count">
-        <b id="resultCount">0 間</b>
-        <span class="sep">·</span>
-        <span class="radius" id="resultRadius"></span>
-      </div>
-      <div class="dataset-note" id="datasetNote"></div>
-      <div class="grid" id="resultsList">
-        <div class="skeleton"><i></i><i></i><i></i><i></i></div>
-      </div>
-    </div>
-
-    <div class="mapwrap">
+<div class="wrap main">
+  <aside class="side">
+    <div class="mapwrap" id="mapwrap">
       <div id="map"></div>
-      <div class="maptools">
-        <button class="maptool" onclick="map.zoomIn()" aria-label="放大">＋</button>
-        <button class="maptool" onclick="map.zoomOut()" aria-label="縮細">−</button>
-      </div>
-      <button class="mapchip" onclick="searchHere()">喺呢個範圍搵</button>
+      <div class="maplabel" onclick="searchHere()">喺呢個範圍搵</div>
     </div>
+
+    <div class="panel">
+      <h3>範圍</h3>
+      <div class="pbody">
+        <select id="radiusSelect" onchange="setRadiusMode(this.value)">
+          <option value="auto">3km 內全部</option>
+          <option value="500">500m 內</option>
+          <option value="800">800m 內</option>
+          <option value="1500">1.5km 內</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>地區</h3>
+      <div class="pbody"><div class="districts" id="districts"></div></div>
+    </div>
+
+    <div class="panel">
+      <h3>設定</h3>
+      <div class="pbody">
+        <div class="wrow"><span>體重</span>
+          <input type="number" id="weightInput" min="30" max="200" step="1"
+                 onchange="setWeight(this.value)" aria-label="體重（公斤）"><span>kg</span>
+        </div>
+        <label class="opt"><input type="checkbox" id="includeOsmBox" onchange="setIncludeOsm(this.checked)">
+          <span>連埋街坊餐廳</span></label>
+        <label class="opt"><input type="checkbox" id="hideStaleBox" checked onchange="setHideStale(this.checked)">
+          <span>隱藏 6 年冇更新</span></label>
+        <button class="redo" onclick="searchNearby()">重新搜尋</button>
+      </div>
+    </div>
+  </aside>
+
+  <div>
+    <div class="resulthead">
+      <span class="chip" id="areaChip" hidden><span id="areaChipText"></span>
+        <button onclick="clearArea()" aria-label="清除">✕</button></span>
+      <button class="reset" onclick="resetFilters()">重設</button>
+      <span class="count"><b id="resultCount">—</b> · <span id="resultRadius"></span></span>
+      <div class="notice" id="locBarSource" hidden></div>
+    </div>
+
+    <div class="rows" id="resultsList">
+      <div class="skeleton"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <p class="dataset-note" id="datasetNote"></p>
   </div>
 </div>
 
@@ -610,7 +422,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-09h';
+    const BUILD = '2026-08-09i';
 
     // ============================================================
     // STATE
@@ -1321,19 +1133,34 @@
     }
 
     function renderLocationBar() {
-      const bar = document.getElementById('locBar');
-      if (!bar) return;
+      const where = document.getElementById('locBarWhere');
+      if (!where) return;
 
-      bar.hidden = false;
-      document.getElementById('locBarDot').className = `locdot ${locationSource || 'none'}`;
-      document.getElementById('locBarWhere').textContent = locationWhere || '未知位置';
+      // 標題淨係擺地名（短），唔好塞成段反查地址落去
+      const short = (locationWhere || '未知位置').split(',')[0].trim();
+      where.textContent = short;
+      const cr = document.getElementById('crumbArea');
+      if (cr) cr.textContent = short;
+      const chip = document.getElementById('areaChip');
+      if (chip) {
+        chip.hidden = false;
+        document.getElementById('areaChipText').textContent = short;
+      }
 
+      // 提示條只喺真係有問題先出：用緊退路位置、用緊上次位置、GPS 誤差大。
+      // 用戶自己搵嘅地點唔係問題，唔需要彈警告。
       const bits = [];
-      if (locationSource) bits.push(SOURCE_LABELS[locationSource] || locationSource);
+      if (locationSource === 'fallback') bits.push(SOURCE_LABELS.fallback);
+      else if (locationSource === 'saved') bits.push(SOURCE_LABELS.saved);
       if (locationAccuracy > 500) bits.push(`誤差約 ±${(locationAccuracy / 1000).toFixed(1)}km，唔準就自己揀地區`);
       else if (locationAccuracy > 60) bits.push(`誤差約 ±${locationAccuracy}m`);
       if (locationNote) bits.push(locationNote);
-      document.getElementById('locBarSource').textContent = bits.length ? '· ' + bits.join(' · ') : '';
+
+      const note = document.getElementById('locBarSource');
+      if (note) {
+        note.textContent = bits.join(' · ');
+        note.hidden = !bits.length;
+      }
     }
 
     function addUserMarker() {
@@ -1815,34 +1642,51 @@
     // FILTER
     // ============================================================
     function buildChips() {
-      // 刻度標籤本身撳得，唔使一定拖條滑桿
-      document.getElementById('healthTicks').innerHTML = CAT_FILTERS.map((f, i) =>
-        `<button class="tick${f.key === filterCat ? ' on' : ''}" data-cat="${f.key}"
-           onclick="setCatByIndex(${i})">${f.label}</button>`).join('');
-
-      const idx = CAT_FILTERS.findIndex(f => f.key === filterCat);
-      document.getElementById('healthRange').value = idx < 0 ? CAT_FILTERS.length - 1 : idx;
+      document.getElementById('healthTicks').innerHTML = CAT_FILTERS.map(f =>
+        `<button class="tab${f.key === filterCat ? ' on' : ''}" data-cat="${f.key}"
+           onclick="setCat('${f.key}')">${f.label}</button>`).join('');
     }
 
-    function setCatByIndex(i) {
-      const f = CAT_FILTERS[Number(i)];
-      if (!f) return;
-      document.getElementById('healthRange').value = i;
-      setCat(f.key);
+    // ---- 收藏（存本機，唔使登入）----
+    const FAV_KEY = 'fitfood:favs';
+    let favs = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+    let favOnly = false;
+
+    function favKey(place) {
+      return place.name.trim() + '@' + place.lat.toFixed(4) + ',' + place.lng.toFixed(4);
     }
 
-    function toggleMore() {
-      const p = document.getElementById('morePanel');
-      const b = document.getElementById('moreBtn');
-      const open = p.hidden;
-      p.hidden = !open;
-      b.setAttribute('aria-expanded', String(open));
-      b.classList.toggle('on', open);
+    function toggleFav(id, ev) {
+      ev.stopPropagation();
+      const place = allPlaces.find(p => p.id === id);
+      if (!place) return;
+      const k = favKey(place);
+      favs.has(k) ? favs.delete(k) : favs.add(k);
+      try { localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); } catch {}
+      renderResults();
     }
+
+    function toggleFavOnly() {
+      favOnly = !favOnly;
+      document.getElementById('favBtn').classList.toggle('active', favOnly);
+      renderResults();
+    }
+
+    function resetFilters() {
+      filterCat = 'all';
+      favOnly = false;
+      radiusMode = 'auto';
+      document.getElementById('favBtn').classList.remove('active');
+      document.getElementById('radiusSelect').value = 'auto';
+      buildChips();
+      renderResults();
+    }
+
+    function clearArea() { resetFilters(); }
 
     function setCat(key) {
       filterCat = key;
-      document.querySelectorAll('#healthTicks .tick').forEach(c =>
+      document.querySelectorAll('#healthTicks .tab').forEach(c =>
         c.classList.toggle('on', c.dataset.cat === key));
       renderResults();
     }
@@ -1877,6 +1721,7 @@
     function getFilteredPlaces() {
       const test = CAT_TEST[filterCat] || CAT_TEST.all;
       const matching = allPlaces.filter(p => {
+        if (favOnly && !favs.has(favKey(p))) return false;
         if (!test(p)) return false;
         if (hideStale && p.stale) return false;
         return true;
@@ -1979,29 +1824,41 @@
         // 兩個標可以並存：左上講來源（精選名單），左下講張相係示意圖
         const badge = '';
 
+        const dm = place.distance * 1000;
+        const dNum = dm < 1000 ? Math.round(dm) : (dm / 1000).toFixed(1);
+        const dUnit = dm < 1000 ? 'M' : 'KM';
+        const tone = dm <= 400 ? '' : (dm <= 1200 ? ' mid' : ' far');
+        const w = walkStats(place.distance);
+        const kind = place.meat === 'none' ? '素食'
+                   : place.health === 'best' ? '健身'
+                   : place.health === 'happy' ? '快樂' : '一般';
+        const isFav = favs.has(favKey(place));
+
         card.innerHTML = `
-          ${photo ? `<div class="photo ${TONE[place.meat] || TONE.other}">
-            <img class="ph-img" src="${photo.url}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.remove()">
-            ${badge}
-          </div>` : ''}
-          <div class="cbody">
-            <a class="go inline" href="${mapsUrl}" target="_blank" rel="noopener"
-               onclick="event.stopPropagation()" title="喺 Google Maps 睇呢間店" aria-label="喺 Google Maps 睇呢間店">
-              <svg viewBox="0 0 24 24"><path d="M8 16 16 8M9.5 8H16v6.5"/></svg>
-            </a>
-            <div class="row">
-              <div class="name">${place.name}</div>
-              <div class="rate">
-                <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.6A2.6 2.6 0 1 1 12 6.4a2.6 2.6 0 0 1 0 5.2z"/></svg>${dist}
-              </div>
+          <div class="thumb${tone}">
+            <span class="d">${dNum}</span><span class="u">${dUnit}</span>
+          </div>
+          <div>
+            <div class="name">${place.name}</div>
+            <div class="addr">${place.address || meta || '附近餐廳'}</div>
+            <div class="metaline">
+              <span class="kind">${kind}</span>
+              <span class="sep">|</span>
+              <span class="walk">行 ${w.mins} 分鐘 · 燒 ${w.kcal} kcal</span>
+              ${place.cuisine ? `<span class="sep">|</span><span>${place.cuisine}</span>` : ''}
             </div>
-            <div class="walk" title="以 ${WALK_KMH}km/h 步速、體重 ${bodyWeight}kg 計">
-              <svg viewBox="0 0 24 24"><path d="M13 4.5a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2zM10.5 22l1.8-5.4-2.1-2.1-.9 4.2M14 22l-1.2-6 -2.4-2.4 .9-4.6 3.2 1.6 1.9 2.6M8.4 9.6 11 8"/></svg>
-              行 ${walkStats(place.distance).mins} 分鐘 · 燒 ${walkStats(place.distance).kcal} kcal
-            </div>
-            <div class="meta">${meta || place.address || '附近餐廳'}</div>
             ${place.why ? `<div class="why">${place.why}</div>` : ''}
             <div class="tags">${axisTags(place)}${place.isFit ? '<span class="mini-tag pick">健身精選</span>' : ''}${place.stale ? '<span class="mini-tag warn">好耐冇更新</span>' : ''}</div>
+          </div>
+          <div class="rowact">
+            <button class="fav${isFav ? ' on' : ''}" onclick="toggleFav('${place.id}',event)"
+                    title="收藏" aria-label="收藏">
+              <svg viewBox="0 0 24 24"><path d="M12 17.3 6.2 20.6l1.4-6.5L2.7 9.7l6.6-.7L12 3l2.7 6 6.6.7-4.9 4.4 1.4 6.5z"/></svg>
+            </button>
+            <a class="go" href="${mapsUrl}" target="_blank" rel="noopener"
+               onclick="event.stopPropagation()" title="喺 Google Maps 睇" aria-label="喺 Google Maps 睇">
+              <svg viewBox="0 0 24 24"><path d="M8 16 16 8M9.5 8H16v6.5"/></svg>
+            </a>
           </div>
         `;
 
