@@ -117,6 +117,33 @@ app.get('/api/reverse', async (req, res) => {
   }
 });
 
+// 研究收集端點：由瀏覽器頁面（例如 ChatGPT 對話）直接 POST 管道分隔嘅
+// 研究結果落硬碟。以前靠 JS 逐段讀返出嚟，每次 2KB 就截斷，好散又易漏行。
+// 只綁 localhost、只寫死一個目錄、只准 .txt —— 唔會變成任意寫檔。
+const COLLECT_DIR = '/Volumes/core/fitfood-data/raw';
+app.post('/api/collect', express.text({ limit: '4mb', type: '*/*' }), (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  const name = String(req.query.name || '').trim();
+  if (!/^[a-z0-9][a-z0-9._-]{0,60}$/i.test(name)) {
+    return res.status(400).json({ error: 'bad name' });
+  }
+  const body = String(req.body || '');
+  if (!body.trim()) return res.status(400).json({ error: 'empty body' });
+  try {
+    require('fs').writeFileSync(path.join(COLLECT_DIR, name + '.txt'), body, 'utf8');
+    const lines = body.trim().split('\n').length;
+    console.log(`collected ${name}.txt — ${lines} 行`);
+    res.json({ ok: true, file: name + '.txt', lines });
+  } catch (err) {
+    console.error('collect error:', err);
+    res.status(500).json({ error: String(err.message) });
+  }
+});
+app.options('/api/collect', (req, res) => {
+  res.set({ 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'Content-Type' }).sendStatus(204);
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
