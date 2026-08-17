@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitFood — 六個世界</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{--ease:cubic-bezier(.23,1,.32,1)}
+  body{background:#16161a;color:#e8e8ea;padding:28px 14px 70px;
+    font-family:"Noto Sans TC",-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .lead{max-width:1080px;margin:0 auto 30px}
+  .lead h1{font-family:"Archivo Black",sans-serif;font-size:clamp(28px,5vw,46px);
+    line-height:.98;letter-spacing:-.02em;text-transform:uppercase}
+  .lead h1 span{color:#8b8b93}
+  .lead p{font-size:14px;line-height:1.65;color:#9a9aa2;margin-top:12px;max-width:56ch}
+
+  .board{display:grid;grid-template-columns:repeat(auto-fit,minmax(348px,1fr));
+    gap:34px;max-width:1500px;margin:0 auto;align-items:start}
+  .slot{min-width:0}
+  .tag{display:flex;align-items:baseline;gap:9px;margin-bottom:9px}
+  .tag i{font-family:"Space Mono",monospace;font-size:11px;color:#6f6f78;font-style:normal}
+  .tag b{font-size:16px;font-weight:700;letter-spacing:-.2px;color:#fff}
+  .note{font-size:12.5px;line-height:1.6;color:#8b8b93;margin-bottom:13px;max-width:44ch}
+  .note em{color:#c9c9d0;font-style:normal}
+
+  .phone{width:100%;max-width:352px;border-radius:36px;overflow:hidden;background:#000;
+    padding:7px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .screen{border-radius:30px;overflow:hidden;height:668px;display:flex;flex-direction:column;position:relative}
+  .sb{height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 19px;font-size:11px;font-weight:700;opacity:.75}
+  .sc{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .sc::-webkit-scrollbar{display:none}
+
+/* ══════════ 1 · 街市價錢牌 ══════════
+   香港街市／大排檔嘅招牌語言：朱紅芥黃、超大字、印刷錯位、
+   距離當「價錢」咁掛出嚟。最本土、最嘈、最唔似其他 app。 */
+  .w1{background:#f3ead6;color:#1b1712}
+  .w1 .sb{color:#1b1712}
+  .w1 .head{background:#c9302c;padding:13px 15px 15px;position:relative;overflow:hidden}
+  .w1 .head::after{content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(90deg,rgba(0,0,0,.07) 0 2px,transparent 2px 5px)}
+  .w1 .zone{font-family:"Archivo Black",sans-serif;font-size:44px;line-height:.86;
+    color:#f7e04f;letter-spacing:-.03em;text-shadow:2.5px 2.5px 0 #7d1310}
+  .w1 .cn{font-family:"Noto Sans TC";font-weight:900;font-size:31px;color:#fff;
+    letter-spacing:.06em;margin-top:3px}
+  .w1 .cnt{font-family:"Space Mono",monospace;font-size:11px;color:#f7e04f;
+    margin-top:7px;letter-spacing:.1em}
+  .w1 .rail{display:flex;gap:0;background:#1b1712}
+  .w1 .rail button{flex:1;border:0;background:none;font-family:"Noto Sans TC";font-weight:900;
+    font-size:13.5px;color:#8a8378;padding:11px 0;cursor:pointer;letter-spacing:.1em;
+    transition:color 180ms var(--ease),background 180ms var(--ease)}
+  .w1 .rail button.on{background:#f7e04f;color:#1b1712}
+  .w1 .list{padding:13px 12px 26px;display:flex;flex-direction:column;gap:11px}
+  .w1 .plate{background:#fffdf6;border:2.5px solid #1b1712;padding:11px 13px;
+    box-shadow:4px 4px 0 #1b1712;cursor:pointer;transition:transform 140ms var(--ease),box-shadow 140ms var(--ease)}
+  .w1 .plate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #1b1712}
+  .w1 .pt{display:flex;align-items:flex-start;gap:10px}
+  .w1 .pn{flex:1;font-weight:900;font-size:17px;line-height:1.2;letter-spacing:-.01em}
+  .w1 .pd{flex:0 0 auto;text-align:right}
+  .w1 .pd b{display:block;font-family:"Bebas Neue",sans-serif;font-size:34px;line-height:.8;
+    color:#c9302c;letter-spacing:.01em}
+  .w1 .pd i{font-family:"Space Mono",monospace;font-size:9.5px;font-style:normal;
+    color:#8a8378;letter-spacing:.14em}
+  .w1 .pa{font-size:12px;color:#6b6459;margin-top:6px;line-height:1.4}
+  .w1 .stamp{display:inline-block;margin-top:8px;border:1.5px solid #c9302c;color:#c9302c;
+    font-weight:900;font-size:10.5px;padding:2px 7px;letter-spacing:.14em;transform:rotate(-1.5deg)}
+  .w1 .burn{font-family:"Space Mono",monospace;font-size:10.5px;color:#1b1712;
+    background:#f7e04f;display:inline-block;padding:2px 6px;margin-top:8px;letter-spacing:.04em}
+
+/* ══════════ 2 · 營養標籤 ══════════
+   借食品營養標籤嘅排版規範：黑粗橫線、等寬數字、全大寫細標籤。
+   極度理性 —— 資訊密度同可掃性最高，一點裝飾都冇。 */
+  .w2{background:#fff;color:#000;font-family:"Space Mono",monospace}
+  .w2 .sb{color:#000}
+  .w2 .head{padding:14px 16px 0}
+  .w2 .t{font-family:"Archivo Black",sans-serif;font-size:27px;line-height:.95;
+    letter-spacing:-.02em;text-transform:uppercase}
+  .w2 .t2{font-family:"Noto Sans TC";font-weight:900;font-size:20px;margin-top:1px}
+  .w2 .hr{height:9px;background:#000;margin:9px 0 0}
+  .w2 .hr.thin{height:2px}
+  .w2 .srv{display:flex;justify-content:space-between;font-size:10.5px;
+    padding:5px 16px;letter-spacing:.06em;text-transform:uppercase}
+  .w2 .picks{display:flex;gap:0;border-top:2px solid #000;border-bottom:2px solid #000}
+  .w2 .picks button{flex:1;border:0;border-right:1px solid #000;background:#fff;
+    font-family:"Space Mono",monospace;font-size:10.5px;font-weight:700;padding:9px 0;
+    cursor:pointer;letter-spacing:.06em;text-transform:uppercase;transition:background 160ms var(--ease)}
+  .w2 .picks button:last-child{border-right:0}
+  .w2 .picks button.on{background:#ccff00}
+  .w2 .item{padding:11px 16px;border-bottom:1px solid #000;cursor:pointer;
+    transition:background 140ms var(--ease)}
+  .w2 .item:active{background:#f4f4f4}
+  .w2 .iv{display:flex;justify-content:space-between;align-items:baseline;gap:9px}
+  .w2 .in{font-family:"Noto Sans TC";font-weight:700;font-size:15px;line-height:1.25;
+    letter-spacing:-.01em;flex:1;min-width:0}
+  .w2 .id{font-family:"Archivo Black",sans-serif;font-size:22px;letter-spacing:-.03em;flex:0 0 auto}
+  .w2 .id sup{font-size:9px;vertical-align:super;letter-spacing:0}
+  .w2 .ir{display:flex;justify-content:space-between;font-size:10.5px;margin-top:6px;
+    padding-top:5px;border-top:1px dotted #999;letter-spacing:.03em;text-transform:uppercase}
+  .w2 .ir b{font-weight:700}
+  .w2 .kcal{background:#ccff00;padding:0 4px}
+  .w2 .ia{font-family:"Noto Sans TC";font-size:11.5px;color:#555;margin-top:5px;line-height:1.45}
+  .w2 .fine{font-size:9.5px;padding:11px 16px 26px;line-height:1.6;color:#555;letter-spacing:.02em}
+
+/* ══════════ 3 · 港鐵綫圖 ══════════
+   用港鐵路綫圖嘅語言：一條粗色帶由上到下，每間店係一個站，
+   站與站之間嘅距離就係真實距離。空間關係變成主結構。 */
+  .w3{background:#fbfbfa;color:#16181d}
+  .w3 .sb{color:#16181d}
+  .w3 .head{padding:15px 18px 12px;border-bottom:1px solid #e3e3e0}
+  .w3 .ln{display:inline-flex;align-items:center;gap:7px;background:#16181d;color:#fff;
+    font-weight:900;font-size:11px;padding:4px 10px;border-radius:99px;letter-spacing:.1em}
+  .w3 .ln i{width:8px;height:8px;border-radius:99px;background:#00918d;font-style:normal}
+  .w3 .t{font-family:"Noto Sans TC";font-weight:900;font-size:29px;margin-top:9px;letter-spacing:-.02em}
+  .w3 .sub{font-size:12px;color:#7b7f88;margin-top:2px}
+  .w3 .picks{display:flex;gap:6px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+  .w3 .picks::-webkit-scrollbar{display:none}
+  .w3 .picks button{flex:0 0 auto;border:1.5px solid #d8d8d4;background:none;
+    font-family:"Noto Sans TC";font-weight:700;font-size:12.5px;color:#5a5e66;
+    padding:6px 13px;border-radius:99px;cursor:pointer;transition:all 180ms var(--ease)}
+  .w3 .picks button.on{background:#00918d;border-color:#00918d;color:#fff}
+  .w3 .track{position:relative;padding:20px 18px 30px 0}
+  .w3 .track::before{content:"";position:absolute;left:40px;top:14px;bottom:24px;
+    width:7px;border-radius:99px;
+    background:linear-gradient(#00918d 0%,#00918d 42%,#8fb03f 42%,#8fb03f 72%,#d8ab3a 72%,#d8ab3a 100%)}
+  .w3 .stn{position:relative;padding-left:66px;cursor:pointer}
+  .w3 .stn+.stn{margin-top:var(--gap,26px)}
+  .w3 .stn::before{content:"";position:absolute;left:34px;top:6px;width:19px;height:19px;
+    border-radius:99px;background:#fbfbfa;border:4.5px solid #00918d;
+    transition:transform 160ms var(--ease)}
+  .w3 .stn:active::before{transform:scale(1.22)}
+  .w3 .stn.g::before{border-color:#8fb03f}
+  .w3 .stn.y::before{border-color:#d8ab3a}
+  .w3 .sn{font-weight:900;font-size:16px;line-height:1.25;letter-spacing:-.01em}
+  .w3 .sd{font-family:"Space Mono",monospace;font-size:11px;color:#7b7f88;margin-top:3px;
+    letter-spacing:.02em}
+  .w3 .sw{font-size:11.5px;color:#5a5e66;margin-top:4px;line-height:1.45}
+  .w3 .leg{position:absolute;left:0;width:34px;text-align:right;top:7px;
+    font-family:"Space Mono",monospace;font-size:10px;color:#a4a8ae}
+
+/* ══════════ 4 · 霓虹夜街 ══════════
+   香港夜晚嘅招牌光：深墨藍底、青同桃紅霓虹、光暈同玻璃反射。
+   氣氛最強，適合「練完夜晚搵食」嘅場景。 */
+  .w4{background:radial-gradient(120% 80% at 20% 0%,#152045 0%,#0a0d1c 55%,#06070f 100%);color:#e9ecff}
+  .w4 .sb{color:#8fa0d8}
+  .w4 .head{padding:15px 17px 13px}
+  .w4 .neon{font-family:"Archivo Black",sans-serif;font-size:38px;line-height:.94;
+    letter-spacing:-.03em;color:#fff;
+    text-shadow:0 0 5px #43e8ff,0 0 18px rgba(67,232,255,.7),0 0 40px rgba(67,232,255,.35)}
+  .w4 .neon em{font-style:normal;color:#ff5fa8;
+    text-shadow:0 0 5px #ff5fa8,0 0 18px rgba(255,95,168,.7),0 0 40px rgba(255,95,168,.3)}
+  .w4 .sub{font-family:"Space Mono",monospace;font-size:11px;color:#7f8cc4;margin-top:7px;letter-spacing:.08em}
+  .w4 .picks{display:flex;gap:7px;margin-top:13px;overflow-x:auto;scrollbar-width:none}
+  .w4 .picks::-webkit-scrollbar{display:none}
+  .w4 .picks button{flex:0 0 auto;border:1px solid rgba(120,150,255,.3);
+    background:rgba(255,255,255,.04);font-family:"Noto Sans TC";font-weight:700;font-size:12.5px;
+    color:#a8b4e8;padding:7px 14px;border-radius:99px;cursor:pointer;
+    backdrop-filter:blur(10px);transition:all 200ms var(--ease)}
+  .w4 .picks button.on{border-color:#43e8ff;color:#0a0d1c;background:#43e8ff;
+    box-shadow:0 0 18px rgba(67,232,255,.55)}
+  .w4 .list{padding:13px 15px 28px;display:flex;flex-direction:column;gap:12px}
+  .w4 .glass{position:relative;border-radius:17px;padding:15px;cursor:pointer;
+    background:linear-gradient(150deg,rgba(255,255,255,.09),rgba(255,255,255,.02));
+    border:1px solid rgba(150,175,255,.16);backdrop-filter:blur(14px);
+    transition:transform 180ms var(--ease),border-color 180ms var(--ease)}
+  .w4 .glass::before{content:"";position:absolute;left:15px;right:15px;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent)}
+  .w4 .glass:active{transform:scale(.985);border-color:rgba(67,232,255,.4)}
+  .w4 .gt{display:flex;align-items:flex-start;gap:11px}
+  .w4 .gn{flex:1;font-weight:700;font-size:16.5px;line-height:1.28;letter-spacing:-.01em}
+  .w4 .gd{flex:0 0 auto;font-family:"Bebas Neue",sans-serif;font-size:31px;line-height:.85;
+    color:#43e8ff;text-shadow:0 0 12px rgba(67,232,255,.6)}
+  .w4 .gd i{display:block;font-family:"Space Mono",monospace;font-size:9px;font-style:normal;
+    color:#6d7cb8;letter-spacing:.14em;text-shadow:none;text-align:right;margin-top:2px}
+  .w4 .ga{font-size:12px;color:#8b97cc;margin-top:5px;line-height:1.45}
+  .w4 .gm{display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:10px;
+    border-top:1px solid rgba(150,175,255,.13);font-family:"Space Mono",monospace;font-size:10.5px}
+  .w4 .gm .k{color:#ff5fa8;text-shadow:0 0 9px rgba(255,95,168,.5)}
+  .w4 .gm .s{color:#4c5686}
+
+/* ══════════ 5 · 雜誌編輯 ══════════
+   襯線大標題 + 編號條目 + 大量留白。最靜、最貴、最似一本
+   食物雜誌嘅專題頁 —— 慢慢揀嘅感覺，唔係快搵。 */
+  .w5{background:#faf7f1;color:#191713}
+  .w5 .sb{color:#191713}
+  .w5 .head{padding:22px 22px 16px}
+  .w5 .kick{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.24em;
+    text-transform:uppercase;color:#9a917f}
+  .w5 .t{font-family:"Instrument Serif",serif;font-size:44px;line-height:.98;
+    letter-spacing:-.02em;margin-top:10px}
+  .w5 .t em{font-style:italic;color:#6e7a4a}
+  .w5 .rule{height:1px;background:#191713;margin:16px 0 0;opacity:.16}
+  .w5 .picks{display:flex;gap:16px;padding:12px 22px 0}
+  .w5 .picks button{border:0;background:none;font-family:"Instrument Serif",serif;
+    font-size:17px;color:#a49b88;padding:0 0 4px;cursor:pointer;position:relative;
+    transition:color 200ms var(--ease)}
+  .w5 .picks button.on{color:#191713}
+  .w5 .picks button.on::after{content:"";position:absolute;left:0;right:0;bottom:0;
+    height:1.5px;background:#6e7a4a}
+  .w5 .list{padding:6px 22px 30px}
+  .w5 .entry{padding:19px 0;border-bottom:1px solid rgba(25,23,19,.11);cursor:pointer}
+  .w5 .no{font-family:"Space Mono",monospace;font-size:10px;color:#9a917f;letter-spacing:.16em}
+  .w5 .en{font-family:"Instrument Serif",serif;font-size:25px;line-height:1.12;
+    letter-spacing:-.01em;margin-top:6px}
+  .w5 .ew{font-size:13px;line-height:1.72;color:#4e483d;margin-top:8px}
+  .w5 .em{display:flex;gap:9px;align-items:baseline;margin-top:11px;
+    font-family:"Space Mono",monospace;font-size:10.5px;color:#9a917f;letter-spacing:.04em}
+  .w5 .em b{font-family:"Instrument Serif",serif;font-size:19px;color:#6e7a4a;
+    letter-spacing:0;font-weight:400}
+
+/* ══════════ 6 · 熱感紙收據 ══════════
+   成條名單係一張長收據：等寬字、虛線、齒孔邊、紅印。
+   最有觸感、最有記憶點 —— 一睇就記得住個 app。 */
+  .w6{background:#4a4a46;color:#1c1a17;padding:0;display:block;overflow:hidden}
+  .w6 .sb{color:#d6d6d0}
+  .w6 .paper{margin:0 16px;background:#fbfaf5;font-family:"Space Mono",monospace;
+    position:relative;padding:18px 15px 26px;
+    box-shadow:0 12px 30px rgba(0,0,0,.4)}
+  /* 齒孔邊 —— 熱感紙撕開嘅鋸齒 */
+  .w6 .paper::before,.w6 .paper::after{content:"";position:absolute;left:0;right:0;height:8px;
+    background:repeating-linear-gradient(135deg,#fbfaf5 0 6px,transparent 6px 12px)}
+  .w6 .paper::before{top:-7px;transform:scaleY(-1)}
+  .w6 .paper::after{bottom:-7px}
+  .w6 .rc{text-align:center}
+  .w6 .rc h2{font-family:"Archivo Black",sans-serif;font-size:19px;letter-spacing:.06em;
+    text-transform:uppercase}
+  .w6 .rc p{font-size:10px;margin-top:4px;letter-spacing:.1em;color:#6a665e}
+  .w6 .dash{border-top:1.5px dashed #b8b3a8;margin:12px 0}
+  .w6 .picks{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+  .w6 .picks button{border:1.5px solid #1c1a17;background:none;font-family:"Space Mono",monospace;
+    font-size:10px;font-weight:700;padding:4px 9px;cursor:pointer;letter-spacing:.06em;
+    text-transform:uppercase;transition:all 160ms var(--ease)}
+  .w6 .picks button.on{background:#1c1a17;color:#fbfaf5}
+  .w6 .li{padding:10px 0;border-bottom:1px dotted #cdc8bc;cursor:pointer}
+  .w6 .l1{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .w6 .ln{font-family:"Noto Sans TC";font-weight:700;font-size:13.5px;flex:1;min-width:0;
+    line-height:1.3}
+  .w6 .lp{font-weight:700;font-size:14px;flex:0 0 auto;letter-spacing:-.02em}
+  .w6 .l2{display:flex;justify-content:space-between;font-size:10px;color:#6a665e;margin-top:4px;
+    letter-spacing:.02em}
+  .w6 .tot{display:flex;justify-content:space-between;font-weight:700;font-size:13px;
+    padding-top:4px}
+  .w6 .seal{margin:14px auto 0;width:104px;height:104px;border:2.5px solid #c0392b;
+    border-radius:99px;display:grid;place-items:center;text-align:center;
+    color:#c0392b;transform:rotate(-11deg);opacity:.9}
+  .w6 .seal b{display:block;font-family:"Archivo Black",sans-serif;font-size:13px;
+    letter-spacing:.04em;line-height:1.15}
+  .w6 .seal i{display:block;font-style:normal;font-size:8.5px;letter-spacing:.14em;margin-top:3px}
+  .w6 .bar{margin-top:16px;height:34px;
+    background:repeating-linear-gradient(90deg,#1c1a17 0 2px,transparent 2px 4px,#1c1a17 4px 5px,transparent 5px 9px)}
+  .w6 .bn{text-align:center;font-size:9.5px;letter-spacing:.28em;margin-top:5px;color:#6a665e}
+
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <h1>六個世界<span> / six directions</span></h1>
+  <p>唔係同一個設計嘅六個變體 —— 係六種唔同嘅視覺語言。同一批紅磡真實資料，撳得，喺手機開最準。揀方向，唔使睇細節。</p>
+</div>
+
+<div class="board">
+
+<!-- 1 -->
+<div class="slot">
+  <div class="tag"><i>01</i><b>街市價錢牌</b></div>
+  <div class="note">香港街市同大排檔嘅招牌語言：<em>朱紅芥黃、超大字、印刷錯位、硬陰影</em>。距離當「價錢」咁掛出嚟。最本土，最唔會撞死其他 app。</div>
+  <div class="phone"><div class="screen w1">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="sc">
+      <div class="head">
+        <div class="zone">HUNG HOM</div>
+        <div class="cn">紅磡搵食</div>
+        <div class="cnt">111 檔 / 3 公里內 / 今日新鮮</div>
+      </div>
+      <div class="rail">
+        <button class="on">全部</button><button>健身</button><button>素食</button><button>快樂</button>
+      </div>
+      <div class="list">
+        <div class="plate"><div class="pt">
+          <div class="pn">可可豬椰香<br>海南雞專門店</div>
+          <div class="pd"><b>120</b><i>METRE</i></div></div>
+          <div class="pa">寶其利街53號地下</div>
+          <span class="stamp">高蛋白</span> <span class="burn">行1分鐘 燒4kcal</span>
+        </div>
+        <div class="plate"><div class="pt">
+          <div class="pn">榕基手撕雞<br>專門店</div>
+          <div class="pd"><b>129</b><i>METRE</i></div></div>
+          <div class="pa">德民街36號地下E1號舖</div>
+          <span class="stamp">去皮低脂</span> <span class="burn">行2分鐘 燒5kcal</span>
+        </div>
+        <div class="plate"><div class="pt">
+          <div class="pn">勇記海南雞</div>
+          <div class="pd"><b>278</b><i>METRE</i></div></div>
+          <div class="pa">馬頭圍道23-35H號隆基大樓</div>
+          <span class="stamp">無骨雞飯</span> <span class="burn">行4分鐘 燒10kcal</span>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 2 -->
+<div class="slot">
+  <div class="tag"><i>02</i><b>營養標籤</b></div>
+  <div class="note">借食品營養標籤嘅排版規範：<em>黑粗橫線、等寬數字、全大寫細標籤、螢光綠標示重點</em>。零裝飾，資訊密度同可掃性最高。</div>
+  <div class="phone"><div class="screen w2">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="sc">
+      <div class="head"><div class="t">Nearby Facts</div><div class="t2">紅磡 · 附近成分表</div></div>
+      <div class="hr"></div>
+      <div class="srv"><span>Servings 111</span><span>Radius 3 KM</span></div>
+      <div class="hr thin"></div>
+      <div class="picks">
+        <button class="on">All</button><button>Fit</button><button>Veg</button><button>Fun</button>
+      </div>
+      <div class="item"><div class="iv">
+        <div class="in">可可豬椰香海南雞專門店</div><div class="id">120<sup>M</sup></div></div>
+        <div class="ia">紅磡寶其利街53號地下</div>
+        <div class="ir"><span>Walk <b>1 MIN</b></span><span class="kcal">Burn <b>4 KCAL</b></span><span>Class <b>FIT</b></span></div>
+      </div>
+      <div class="item"><div class="iv">
+        <div class="in">榕基手撕雞專門店</div><div class="id">129<sup>M</sup></div></div>
+        <div class="ia">紅磡德民街36號地下E1號舖</div>
+        <div class="ir"><span>Walk <b>2 MIN</b></span><span class="kcal">Burn <b>5 KCAL</b></span><span>Class <b>FIT</b></span></div>
+      </div>
+      <div class="item"><div class="iv">
+        <div class="in">肯德雞 KFC</div><div class="id">163<sup>M</sup></div></div>
+        <div class="ia">紅磡德民街</div>
+        <div class="ir"><span>Walk <b>2 MIN</b></span><span class="kcal">Burn <b>6 KCAL</b></span><span>Class <b>FUN</b></span></div>
+      </div>
+      <div class="item"><div class="iv">
+        <div class="in">RainbowTree88</div><div class="id">278<sup>M</sup></div></div>
+        <div class="ia">紅磡商業中心地庫B75號舖</div>
+        <div class="ir"><span>Walk <b>3 MIN</b></span><span class="kcal">Burn <b>10 KCAL</b></span><span>Class <b>VEG</b></span></div>
+      </div>
+      <div class="hr"></div>
+      <div class="fine">* 距離為直線距離，實際行路通常長 20–30%。<br>* 消耗以體重 70KG、步速 5KM/H 估算，屬淨消耗。<br>* 分類依店名及菜式判斷，非營養師建議。</div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 3 -->
+<div class="slot">
+  <div class="tag"><i>03</i><b>港鐵綫圖</b></div>
+  <div class="note">用港鐵路綫圖嘅語言：<em>一條粗色帶由近到遠，每間店係一個站</em>。站與站之間嘅間距＝真實距離差。空間關係本身變成主結構。</div>
+  <div class="phone"><div class="screen w3">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="sc">
+      <div class="head">
+        <div class="ln"><i></i>健身綫 FIT LINE</div>
+        <div class="t">紅磡站</div>
+        <div class="sub">往 3 公里方向 · 111 個站</div>
+        <div class="picks"><button class="on">全部</button><button>健身</button><button>素食</button><button>快樂</button></div>
+      </div>
+      <div class="track">
+        <div class="stn"><span class="leg">120m</span>
+          <div class="sn">可可豬椰香海南雞</div>
+          <div class="sd">1 MIN · 4 KCAL</div>
+          <div class="sw">原隻雞為主，走皮走油飯即成高蛋白餐</div></div>
+        <div class="stn" style="--gap:22px"><span class="leg">129m</span>
+          <div class="sn">榕基手撕雞</div>
+          <div class="sd">2 MIN · 5 KCAL</div>
+          <div class="sw">去皮手撕雞低脂高蛋白，配油飯可走飯</div></div>
+        <div class="stn g" style="--gap:42px"><span class="leg">211m</span>
+          <div class="sn">Healthy Rice Noodle</div>
+          <div class="sd">3 MIN · 7 KCAL</div></div>
+        <div class="stn g" style="--gap:34px"><span class="leg">278m</span>
+          <div class="sn">RainbowTree88</div>
+          <div class="sd">3 MIN · 10 KCAL</div>
+          <div class="sw">Vegan 沙律店，清淡高纖</div></div>
+        <div class="stn y" style="--gap:52px"><span class="leg">322m</span>
+          <div class="sn">勇記海南雞</div>
+          <div class="sd">4 MIN · 11 KCAL</div></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 4 -->
+<div class="slot">
+  <div class="tag"><i>04</i><b>霓虹夜街</b></div>
+  <div class="note">香港夜晚招牌嘅光：<em>深墨藍、青同桃紅霓虹、玻璃反光同光暈</em>。氣氛最強，貼「夜晚練完出街搵食」嗰個真實場景。</div>
+  <div class="phone"><div class="screen w4">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="sc">
+      <div class="head">
+        <div class="neon">紅磡<em>夜食</em></div>
+        <div class="sub">111 SPOTS / WITHIN 3 KM</div>
+        <div class="picks"><button class="on">全部</button><button>健身</button><button>素食</button><button>快樂</button><button>收藏</button></div>
+      </div>
+      <div class="list">
+        <div class="glass"><div class="gt">
+          <div class="gn">可可豬椰香海南雞專門店</div>
+          <div class="gd">120<i>METRE</i></div></div>
+          <div class="ga">紅磡寶其利街53號地下</div>
+          <div class="gm"><span class="s">行 1 分鐘</span><span class="s">·</span><span class="k">燒 4 KCAL</span><span class="s">·</span><span class="s">健身</span></div>
+        </div>
+        <div class="glass"><div class="gt">
+          <div class="gn">榕基手撕雞專門店</div>
+          <div class="gd">129<i>METRE</i></div></div>
+          <div class="ga">紅磡德民街36號地下E1號舖</div>
+          <div class="gm"><span class="s">行 2 分鐘</span><span class="s">·</span><span class="k">燒 5 KCAL</span><span class="s">·</span><span class="s">健身</span></div>
+        </div>
+        <div class="glass"><div class="gt">
+          <div class="gn">RainbowTree88</div>
+          <div class="gd">278<i>METRE</i></div></div>
+          <div class="ga">紅磡商業中心地庫B75號舖</div>
+          <div class="gm"><span class="s">行 3 分鐘</span><span class="s">·</span><span class="k">燒 10 KCAL</span><span class="s">·</span><span class="s">素食</span></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 5 -->
+<div class="slot">
+  <div class="tag"><i>05</i><b>雜誌編輯</b></div>
+  <div class="note">襯線大標題 + 編號條目 + 大量留白。<em>最靜、最貴</em>，似一本食物雜誌嘅專題頁 —— 慢慢揀嘅感覺，唔係趕住搵。</div>
+  <div class="phone"><div class="screen w5">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="sc">
+      <div class="head">
+        <div class="kick">Hung Hom · 3 km radius</div>
+        <div class="t">練完之後，<br><em>食啲乜好</em></div>
+        <div class="rule"></div>
+      </div>
+      <div class="picks"><button class="on">全部</button><button>健身</button><button>素食</button><button>快樂</button></div>
+      <div class="list">
+        <div class="entry"><div class="no">NO. 01 — 120 METRES</div>
+          <div class="en">可可豬椰香海南雞專門店</div>
+          <div class="ew">原隻雞為主，走皮走油飯即成高蛋白餐。前後兩條街最近嘅一間，行過去一分鐘。</div>
+          <div class="em">寶其利街53號 · 行 <b>1</b> 分鐘 · 燒 <b>4</b> kcal</div></div>
+        <div class="entry"><div class="no">NO. 02 — 129 METRES</div>
+          <div class="en">榕基手撕雞專門店</div>
+          <div class="ew">手撕雞專門店，去皮手撕雞係低脂高蛋白，配油飯可以走飯。</div>
+          <div class="em">德民街36號 · 行 <b>2</b> 分鐘 · 燒 <b>5</b> kcal</div></div>
+        <div class="entry"><div class="no">NO. 03 — 278 METRES</div>
+          <div class="en">RainbowTree88</div>
+          <div class="ew">以 Vegan 及 Green Food 為定位並屬沙律店，適合想食清淡高纖餐人士。</div>
+          <div class="em">紅磡商業中心 · 行 <b>3</b> 分鐘 · 燒 <b>10</b> kcal</div></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 6 -->
+<div class="slot">
+  <div class="tag"><i>06</i><b>熱感紙收據</b></div>
+  <div class="note">成條名單係<em>一張長收據</em>：等寬字、虛線、齒孔撕邊、紅色蓋印、條碼。最有觸感同記憶點 —— 睇一次就記得住。</div>
+  <div class="phone"><div class="screen w6">
+    <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="sc" style="padding:16px 0 26px">
+      <div class="paper">
+        <div class="rc"><h2>FitFood HK</h2>
+          <p>紅磡分店 · 3KM RADIUS</p>
+          <p>2026-08-17 21:41 · 體重 70KG</p></div>
+        <div class="dash"></div>
+        <div class="picks"><button class="on">ALL</button><button>FIT</button><button>VEG</button><button>FUN</button></div>
+        <div class="dash"></div>
+        <div class="li"><div class="l1"><span class="ln">可可豬椰香海南雞</span><span class="lp">120M</span></div>
+          <div class="l2"><span>寶其利街53號</span><span>1MIN / 4KCAL</span></div></div>
+        <div class="li"><div class="l1"><span class="ln">榕基手撕雞專門店</span><span class="lp">129M</span></div>
+          <div class="l2"><span>德民街36號</span><span>2MIN / 5KCAL</span></div></div>
+        <div class="li"><div class="l1"><span class="ln">肯德雞 KFC</span><span class="lp">163M</span></div>
+          <div class="l2"><span>德民街</span><span>2MIN / 6KCAL</span></div></div>
+        <div class="li"><div class="l1"><span class="ln">RainbowTree88</span><span class="lp">278M</span></div>
+          <div class="l2"><span>紅磡商業中心</span><span>3MIN / 10KCAL</span></div></div>
+        <div class="li"><div class="l1"><span class="ln">勇記海南雞</span><span class="lp">278M</span></div>
+          <div class="l2"><span>馬頭圍道23-35H號</span><span>4MIN / 10KCAL</span></div></div>
+        <div class="dash"></div>
+        <div class="tot"><span>合計</span><span>111 間</span></div>
+        <div class="tot"><span>行匀最近三間</span><span>燒 15 KCAL</span></div>
+        <div class="dash"></div>
+        <div class="seal"><div><b>健身<br>認可</b><i>FIT APPROVED</i></div></div>
+        <div class="bar"></div>
+        <div class="bn">FITFOOD · HUNG HOM · 111</div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+</div>
+
+<script>
+  // 每個世界嘅篩選掣都撳得 —— 靜態圖睇唔出手感
+  document.querySelectorAll('.rail,.picks').forEach(g => {
+    g.querySelectorAll('button').forEach(b => b.onclick = () => {
+      g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    });
+  });
+</script>
+</body>
+</html>
