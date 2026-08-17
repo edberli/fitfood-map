@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitFood — 設計方案</title>
+<style>
+  /* ============================================================
+     三個 Apple 原生風格方案。全部用系統字體 —— Apple 自己嘅字已經
+     內建 optical sizing、tracking 表、易讀性調校，唔應該覆蓋。
+     ============================================================ */
+  :root{
+    --sys:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",
+          "PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    --ease-out:cubic-bezier(.23,1,.32,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:var(--sys);background:#e8e8ed;color:#1c1c1e;
+    padding:20px 12px 60px;-webkit-font-smoothing:antialiased}
+
+  .lead{max-width:980px;margin:0 auto 22px;padding:0 6px}
+  .lead h1{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:5px}
+  .lead p{font-size:14px;line-height:1.6;color:#6b6b70}
+
+  .board{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+    gap:26px;max-width:1180px;margin:0 auto;align-items:start}
+  .col{min-width:0}
+  .caption{margin:0 4px 10px}
+  .caption b{display:block;font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .caption span{display:block;font-size:12.5px;line-height:1.55;color:#6b6b70;margin-top:3px}
+
+  /* 手機框 —— 睇 mockup 要有真實比例參照 */
+  .phone{width:100%;max-width:360px;margin:0 auto;border-radius:38px;
+    overflow:hidden;background:#000;padding:8px;
+    box-shadow:0 20px 50px rgba(28,28,30,.22),0 2px 6px rgba(28,28,30,.14)}
+  .screen{border-radius:31px;overflow:hidden;height:660px;position:relative;
+    display:flex;flex-direction:column}
+  .statusbar{height:34px;flex:0 0 34px;display:flex;align-items:center;
+    justify-content:space-between;padding:0 20px;font-size:12px;font-weight:600}
+  .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .scroll::-webkit-scrollbar{display:none}
+
+  /* ─────────────────────────────────────────────────────────
+     A · 分組列表（Maps / Settings 款）
+     Apple 最典型嘅列表：灰底 + 白色圓角組 + 0.5px 內縮分隔線。
+     ───────────────────────────────────────────────────────── */
+  .A{background:#f2f2f7;color:#000}
+  .A .statusbar{color:#000}
+  /* 半透明 nav：內容喺下面碌過，唔係一條實色帶食走空間 */
+  .A .nav{position:sticky;top:0;z-index:5;background:rgba(242,242,247,.82);
+    backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+    padding:2px 16px 8px}
+  .A .lg{font-size:32px;font-weight:700;letter-spacing:-.8px;line-height:1.12}
+  .A .sub{font-size:14px;color:#8e8e93;margin-top:1px}
+  .A .seg{display:flex;background:rgba(118,118,128,.12);border-radius:9px;
+    padding:2px;margin-top:11px}
+  .A .seg button{flex:1;border:0;background:none;font:inherit;font-size:13px;
+    font-weight:600;color:#000;padding:6px 0;border-radius:7px;cursor:pointer;
+    transition:background 200ms var(--ease-out)}
+  .A .seg button[aria-selected=true]{background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.10),0 3px 8px rgba(0,0,0,.06)}
+  .A .hdr{font-size:12.5px;font-weight:600;color:#8e8e93;letter-spacing:.4px;
+    text-transform:uppercase;padding:20px 32px 7px}
+  .A .group{background:#fff;border-radius:10px;margin:0 16px;overflow:hidden}
+  .A .row{display:flex;align-items:center;gap:12px;padding:11px 14px;
+    position:relative;cursor:pointer;transition:background 120ms var(--ease-out)}
+  .A .row:active{background:#d1d1d6}
+  .A .row+.row::before{content:"";position:absolute;left:56px;right:0;top:0;
+    height:.5px;background:#c6c6c8}
+  .A .icon{width:32px;height:32px;flex:0 0 32px;border-radius:8px;
+    display:grid;place-items:center;font-size:15px}
+  .A .ic-chick{background:#e8f3ec;color:#2f7d52}
+  .A .ic-veg{background:#eaf2e8;color:#4a7a3c}
+  .A .ic-happy{background:#fdf0e6;color:#b5651d}
+  .A .txt{flex:1;min-width:0}
+  .A .nm{font-size:16px;font-weight:600;letter-spacing:-.2px;line-height:1.28;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .A .de{font-size:13px;color:#8e8e93;margin-top:1px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .A .tail{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+  .A .dist{font-size:15px;color:#8e8e93;font-variant-numeric:tabular-nums}
+  .A .chev{width:7px;height:12px;flex:0 0 7px}
+  .A .chev path{stroke:#c7c7cc;stroke-width:2.2;fill:none;stroke-linecap:round}
+  .A .foot{font-size:12.5px;color:#8e8e93;line-height:1.5;padding:8px 32px 26px}
+
+  /* ─────────────────────────────────────────────────────────
+     B · 深色數據卡（Fitness 款）
+     Fitness app 嘅語言：純黑底、深灰卡、數字做主角、
+     用色編碼指標（綠＝距離，橙＝消耗，同 Activity ring 一致）。
+     ───────────────────────────────────────────────────────── */
+  .B{background:#000;color:#fff}
+  .B .statusbar{color:#fff}
+  .B .nav{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.7);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:2px 16px 10px}
+  .B .lg{font-size:32px;font-weight:700;letter-spacing:-.8px}
+  .B .sub{font-size:14px;color:#8e8e93;margin-top:1px}
+  .B .chips{display:flex;gap:7px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+  .B .chips::-webkit-scrollbar{display:none}
+  .B .chip{flex:0 0 auto;border:0;font:inherit;font-size:13px;font-weight:600;
+    padding:7px 14px;border-radius:99px;background:#1c1c1e;color:#8e8e93;cursor:pointer;
+    transition:background 200ms var(--ease-out),color 200ms var(--ease-out)}
+  .B .chip.on{background:#fff;color:#000}
+  .B .list{padding:14px 16px 26px;display:flex;flex-direction:column;gap:10px}
+  .B .card{background:#1c1c1e;border-radius:16px;padding:15px;cursor:pointer;
+    transition:transform 160ms var(--ease-out),background 160ms var(--ease-out)}
+  .B .card:active{transform:scale(.98);background:#242426}
+  .B .top{display:flex;align-items:flex-start;gap:10px}
+  .B .nm{flex:1;font-size:16.5px;font-weight:600;letter-spacing:-.2px;line-height:1.3}
+  .B .badge{flex:0 0 auto;font-size:11px;font-weight:700;padding:3px 8px;
+    border-radius:99px;background:rgba(120,220,160,.16);color:#5fd894;letter-spacing:.02em}
+  .B .badge.h{background:rgba(255,159,80,.16);color:#ff9f50}
+  .B .de{font-size:13px;color:#8e8e93;margin-top:4px;line-height:1.45}
+  /* 兩個數字並排：距離同消耗係一組資料，唔應該分開擺 */
+  .B .stats{display:flex;gap:22px;margin-top:13px;padding-top:13px;
+    border-top:.5px solid #3a3a3c}
+  .B .stat .v{font-size:23px;font-weight:700;letter-spacing:-.7px;
+    font-variant-numeric:tabular-nums;line-height:1}
+  .B .stat .v.g{color:#5fd894}
+  .B .stat .v.o{color:#ff9f50}
+  .B .stat .v small{font-size:12px;font-weight:600;margin-left:2px}
+  .B .stat .k{font-size:11px;color:#8e8e93;margin-top:4px;letter-spacing:.03em}
+
+  /* ─────────────────────────────────────────────────────────
+     C · 大卡片（Health 款）
+     Health app：白底、寬鬆留白、彩色分類圖示、一張卡一件事。
+     字級對比大 —— 標題重、輔助資訊淡。
+     ───────────────────────────────────────────────────────── */
+  .C{background:#fff;color:#000}
+  .C .statusbar{color:#000}
+  .C .nav{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.84);
+    backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+    padding:2px 20px 12px}
+  .C .kicker{font-size:12.5px;font-weight:700;color:#7f9070;letter-spacing:.7px;
+    text-transform:uppercase}
+  .C .lg{font-size:29px;font-weight:700;letter-spacing:-.7px;margin-top:2px}
+  .C .tabs{display:flex;gap:18px;margin-top:13px}
+  .C .tb{border:0;background:none;font:inherit;font-size:14.5px;font-weight:600;
+    color:#aeaeb2;padding:0 0 8px;position:relative;cursor:pointer;
+    transition:color 200ms var(--ease-out)}
+  .C .tb.on{color:#000}
+  .C .tb.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2.5px;
+    border-radius:2px;background:#7f9070}
+  .C .list{padding:16px 20px 28px;display:flex;flex-direction:column;gap:13px}
+  .C .card{border:1px solid #ececef;border-radius:18px;padding:16px;cursor:pointer;
+    transition:transform 160ms var(--ease-out),box-shadow 160ms var(--ease-out)}
+  .C .card:active{transform:scale(.985);box-shadow:0 6px 18px rgba(0,0,0,.07)}
+  .C .head{display:flex;align-items:center;gap:11px}
+  .C .ic{width:36px;height:36px;flex:0 0 36px;border-radius:11px;display:grid;
+    place-items:center;font-size:16px}
+  .C .ic-chick{background:#eef4ef;color:#4a7a5c}
+  .C .ic-veg{background:#f0f4ec;color:#5c7a45}
+  .C .nm{flex:1;min-width:0;font-size:17px;font-weight:700;letter-spacing:-.3px;
+    line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .C .big{font-size:20px;font-weight:700;letter-spacing:-.5px;color:#7f9070;
+    font-variant-numeric:tabular-nums}
+  .C .big small{font-size:11.5px;font-weight:600;color:#aeaeb2;margin-left:1px}
+  .C .de{font-size:13.5px;color:#8e8e93;margin-top:10px;line-height:1.5}
+  .C .why{font-size:13.5px;color:#3a3a3c;margin-top:8px;line-height:1.62}
+  .C .meta{display:flex;gap:7px;align-items:center;margin-top:12px;
+    padding-top:12px;border-top:1px solid #f2f2f5;font-size:12.5px;color:#8e8e93}
+  .C .meta b{color:#3a3a3c;font-weight:600}
+  .C .dot{width:3px;height:3px;border-radius:99px;background:#d1d1d6;flex:0 0 3px}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <h1>三個方案</h1>
+  <p>全部用 Apple 系統字體同原生比例。A 最貼近 iOS 內建 app；B 借 Fitness app 嘅深色數據語言；C 借 Health app 嘅大卡片。撳得，可以試下手感。</p>
+</div>
+
+<div class="board">
+
+  <!-- ══ A ══ -->
+  <div class="col">
+    <div class="caption"><b>A · 分組列表</b>
+      <span>Maps 搜尋結果／設定嘅款。灰底、白色圓角組、0.5px 內縮分隔線、右邊箭嘴。資訊密度最高，一屏睇到最多間。</span></div>
+    <div class="phone"><div class="screen A">
+      <div class="statusbar"><span>9:41</span><span style="letter-spacing:2px">●●●  ▮</span></div>
+      <div class="scroll">
+        <div class="nav">
+          <div class="lg">紅磡</div>
+          <div class="sub">111 間 · 3km 內</div>
+          <div class="seg" role="tablist">
+            <button role="tab" aria-selected="true">全部</button>
+            <button role="tab" aria-selected="false">健身</button>
+            <button role="tab" aria-selected="false">素食</button>
+            <button role="tab" aria-selected="false">快樂</button>
+          </div>
+        </div>
+
+        <div class="hdr">行 5 分鐘內</div>
+        <div class="group">
+          <div class="row"><div class="icon ic-chick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15.5 5.5a3.5 3.5 0 1 0-6.6 1.6C7.2 8 6 9.8 6 12a6 6 0 0 0 9.7 4.7l2.6 3.1 1.5-1.3-2.6-3.1A6 6 0 0 0 15.5 5.5z"/></svg></div><div class="txt">
+            <div class="nm">可可豬椰香海南雞專門店</div><div class="de">寶其利街 · 行 1 分鐘 · 4 kcal</div></div>
+            <div class="tail"><span class="dist">120 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+          <div class="row"><div class="icon ic-chick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15.5 5.5a3.5 3.5 0 1 0-6.6 1.6C7.2 8 6 9.8 6 12a6 6 0 0 0 9.7 4.7l2.6 3.1 1.5-1.3-2.6-3.1A6 6 0 0 0 15.5 5.5z"/></svg></div><div class="txt">
+            <div class="nm">榕基手撕雞專門店</div><div class="de">德民街 · 行 2 分鐘 · 5 kcal</div></div>
+            <div class="tail"><span class="dist">129 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+          <div class="row"><div class="icon ic-happy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M5 10h14l-1.4 9.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 10z"/><path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3"/></svg></div><div class="txt">
+            <div class="nm">肯德雞 KFC</div><div class="de">快樂 · 行 2 分鐘 · 6 kcal</div></div>
+            <div class="tail"><span class="dist">163 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+          <div class="row"><div class="icon ic-veg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 21c0-6 3.5-10 8-11-1 5-4 8-8 11z"/><path d="M12 21C12 14 8 10 4 9c1 5 4 9 8 12z"/></svg></div><div class="txt">
+            <div class="nm">Be With Years 素年</div><div class="de">黃埔天地 · 行 4 分鐘 · 9 kcal</div></div>
+            <div class="tail"><span class="dist">258 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+        </div>
+
+        <div class="hdr">再遠少少</div>
+        <div class="group">
+          <div class="row"><div class="icon ic-veg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 21c0-6 3.5-10 8-11-1 5-4 8-8 11z"/><path d="M12 21C12 14 8 10 4 9c1 5 4 9 8 12z"/></svg></div><div class="txt">
+            <div class="nm">RainbowTree88</div><div class="de">紅磡商業中心 · 行 4 分鐘 · 10 kcal</div></div>
+            <div class="tail"><span class="dist">278 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+          <div class="row"><div class="icon ic-chick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15.5 5.5a3.5 3.5 0 1 0-6.6 1.6C7.2 8 6 9.8 6 12a6 6 0 0 0 9.7 4.7l2.6 3.1 1.5-1.3-2.6-3.1A6 6 0 0 0 15.5 5.5z"/></svg></div><div class="txt">
+            <div class="nm">勇記海南雞</div><div class="de">馬頭圍道 · 行 4 分鐘 · 10 kcal</div></div>
+            <div class="tail"><span class="dist">278 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+          <div class="row"><div class="icon ic-chick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15.5 5.5a3.5 3.5 0 1 0-6.6 1.6C7.2 8 6 9.8 6 12a6 6 0 0 0 9.7 4.7l2.6 3.1 1.5-1.3-2.6-3.1A6 6 0 0 0 15.5 5.5z"/></svg></div><div class="txt">
+            <div class="nm">Healthy Rice Noodle</div><div class="de">行 3 分鐘 · 7 kcal</div></div>
+            <div class="tail"><span class="dist">211 米</span>
+            <svg class="chev" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5"/></svg></div></div>
+        </div>
+        <div class="foot">距離係直線距離，實際行路通常長 20–30%。消耗以 70kg、步速 5km/h 估算。</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ══ B ══ -->
+  <div class="col">
+    <div class="caption"><b>B · 深色數據卡</b>
+      <span>Fitness app 嘅語言。距離用綠、消耗用橙，同 Activity ring 一致。最似「健身 app」，行路消耗變成成張卡嘅重點。</span></div>
+    <div class="phone"><div class="screen B">
+      <div class="statusbar"><span>9:41</span><span style="letter-spacing:2px">●●●  ▮</span></div>
+      <div class="scroll">
+        <div class="nav">
+          <div class="lg">紅磡</div>
+          <div class="sub">111 間 · 3km 內</div>
+          <div class="chips">
+            <button class="chip on">全部</button><button class="chip">健身</button>
+            <button class="chip">素食</button><button class="chip">快樂</button>
+            <button class="chip">收藏</button>
+          </div>
+        </div>
+        <div class="list">
+          <div class="card">
+            <div class="top"><div class="nm">可可豬椰香海南雞專門店</div><span class="badge">健身</span></div>
+            <div class="de">紅磡寶其利街53號地下</div>
+            <div class="stats">
+              <div class="stat"><div class="v g">120<small>M</small></div><div class="k">距離</div></div>
+              <div class="stat"><div class="v">1<small>分鐘</small></div><div class="k">步程</div></div>
+              <div class="stat"><div class="v o">4<small>KCAL</small></div><div class="k">行過去消耗</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="top"><div class="nm">榕基手撕雞專門店</div><span class="badge">健身</span></div>
+            <div class="de">紅磡德民街36號地下E1號舖</div>
+            <div class="stats">
+              <div class="stat"><div class="v g">129<small>M</small></div><div class="k">距離</div></div>
+              <div class="stat"><div class="v">2<small>分鐘</small></div><div class="k">步程</div></div>
+              <div class="stat"><div class="v o">5<small>KCAL</small></div><div class="k">行過去消耗</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="top"><div class="nm">肯德雞 KFC</div><span class="badge h">快樂</span></div>
+            <div class="de">紅磡德民街</div>
+            <div class="stats">
+              <div class="stat"><div class="v g">163<small>M</small></div><div class="k">距離</div></div>
+              <div class="stat"><div class="v">2<small>分鐘</small></div><div class="k">步程</div></div>
+              <div class="stat"><div class="v o">6<small>KCAL</small></div><div class="k">行過去消耗</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="top"><div class="nm">勇記海南雞</div><span class="badge">健身</span></div>
+            <div class="de">紅磡馬頭圍道23-35H號隆基大樓</div>
+            <div class="stats">
+              <div class="stat"><div class="v g">278<small>M</small></div><div class="k">距離</div></div>
+              <div class="stat"><div class="v">4<small>分鐘</small></div><div class="k">步程</div></div>
+              <div class="stat"><div class="v o">10<small>KCAL</small></div><div class="k">行過去消耗</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ══ C ══ -->
+  <div class="col">
+    <div class="caption"><b>C · 大卡片</b>
+      <span>Health app 嘅款。白底、留白闊、一張卡一間店，「點解適合」讀得舒服。綠色用返你要嘅 Morandi 調。</span></div>
+    <div class="phone"><div class="screen C">
+      <div class="statusbar"><span>9:41</span><span style="letter-spacing:2px">●●●  ▮</span></div>
+      <div class="scroll">
+        <div class="nav">
+          <div class="kicker">附近 · 111 間</div>
+          <div class="lg">紅磡</div>
+          <div class="tabs">
+            <button class="tb on">全部</button><button class="tb">健身</button>
+            <button class="tb">素食</button><button class="tb">快樂</button>
+          </div>
+        </div>
+        <div class="list">
+          <div class="card">
+            <div class="head"><div class="ic ic-chick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15.5 5.5a3.5 3.5 0 1 0-6.6 1.6C7.2 8 6 9.8 6 12a6 6 0 0 0 9.7 4.7l2.6 3.1 1.5-1.3-2.6-3.1A6 6 0 0 0 15.5 5.5z"/></svg></div>
+              <div class="nm">可可豬椰香海南雞專門店</div>
+              <div class="big">120<small>M</small></div></div>
+            <div class="why">椰香海南雞專門店，原隻雞為主，走皮走油飯即成高蛋白餐。</div>
+            <div class="meta">紅磡寶其利街53號<span class="dot"></span>行 <b>1 分鐘</b><span class="dot"></span>燒 <b>4 kcal</b></div>
+          </div>
+          <div class="card">
+            <div class="head"><div class="ic ic-chick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15.5 5.5a3.5 3.5 0 1 0-6.6 1.6C7.2 8 6 9.8 6 12a6 6 0 0 0 9.7 4.7l2.6 3.1 1.5-1.3-2.6-3.1A6 6 0 0 0 15.5 5.5z"/></svg></div>
+              <div class="nm">榕基手撕雞專門店</div>
+              <div class="big">129<small>M</small></div></div>
+            <div class="why">手撕雞專門店，去皮手撕雞係低脂高蛋白，配油飯可以走飯。</div>
+            <div class="meta">紅磡德民街36號<span class="dot"></span>行 <b>2 分鐘</b><span class="dot"></span>燒 <b>5 kcal</b></div>
+          </div>
+          <div class="card">
+            <div class="head"><div class="ic ic-veg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 21c0-6 3.5-10 8-11-1 5-4 8-8 11z"/><path d="M12 21C12 14 8 10 4 9c1 5 4 9 8 12z"/></svg></div>
+              <div class="nm">RainbowTree88</div>
+              <div class="big">278<small>M</small></div></div>
+            <div class="why">以 Vegan 及 Green Food 為定位並屬沙律店，適合想食清淡高纖餐人士。</div>
+            <div class="meta">紅磡商業中心地庫<span class="dot"></span>行 <b>3 分鐘</b><span class="dot"></span>燒 <b>10 kcal</b></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+
+<script>
+  // 撳得 —— 靜態圖睇唔出手感，一定要試得
+  document.querySelectorAll('.A .seg button').forEach(b => b.onclick = () => {
+    b.closest('.seg').querySelectorAll('button')
+      .forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  });
+  document.querySelectorAll('.B .chip').forEach(b => b.onclick = () => {
+    b.parentElement.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+  });
+  document.querySelectorAll('.C .tb').forEach(b => b.onclick = () => {
+    b.parentElement.querySelectorAll('.tb').forEach(x => x.classList.toggle('on', x === b));
+  });
+</script>
+</body>
+</html>
