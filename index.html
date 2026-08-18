@@ -364,8 +364,10 @@
     /* ---------- 手機 ---------- */
     @media(max-width:900px){
       .main{grid-template-columns:1fr;padding-top:var(--s-3)}
-      .side{position:static;order:2}
-      .mapwrap{height:220px}
+      /* 範圍設定要喺最頂：搵幾多米、要唔要縮窄範圍係用戶開頭要做嘅決定，
+         擺喺 100 幾張卡後面等於用戶要碌晒成頁先搵到 —— 冇人會咁做 */
+      .side{position:static}
+      .mapwrap{height:180px}
       /* 一行放唔落就摺兩行：logo + 兩粒掣一行，搜尋框佔滿第二行。
          唔准縮到爆 —— 橫向滾動會令右邊嘅距離數字睇唔到。 */
       .topbar .wrap{flex-wrap:wrap;height:auto;padding:7px var(--s-3);gap:7px}
@@ -541,7 +543,7 @@
 
   <script>
     // 每次部署都要改。畫面右下角會顯示 —— 一睇就知你部瀏覽器攞緊新版定舊 cache。
-    const BUILD = '2026-08-18c';
+    const BUILD = '2026-08-18d';
 
     // ============================================================
     // STATE
