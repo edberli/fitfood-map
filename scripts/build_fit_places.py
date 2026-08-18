@@ -48,9 +48,17 @@ def metres(p, q):
          math.cos(math.radians(q[0])) * math.sin(dlo / 2) ** 2)
     return R * 2 * math.asin(math.sqrt(h))
 
-def _one(q):
-    """打一次 Nominatim，回香港範圍內嘅座標，否則 None。"""
-    params = urllib.parse.urlencode({'q': q, 'format': 'json', 'limit': 1})
+def _one(q, viewbox=None):
+    """打一次 Nominatim，回香港範圍內嘅座標，否則 None。
+
+    viewbox=(minLng,minLat,maxLng,maxLat) 會加 bounded=1 —— 結果只會喺個框入面。
+    冇框嘅時候 Nominatim 對香港細區好差：實測「花園街, 太子, 香港」會落到
+    坑口村、「大南街」會落到大澳。有框就搵唔到好過搵錯。"""
+    args = {'q': q, 'format': 'json', 'limit': 1}
+    if viewbox:
+        args['viewbox'] = ','.join(str(round(v, 5)) for v in viewbox)
+        args['bounded'] = 1
+    params = urllib.parse.urlencode(args)
     try:
         req = urllib.request.Request(f'https://nominatim.openstreetmap.org/search?{params}', headers=UA)
         d = json.load(urllib.request.urlopen(req, timeout=25))
@@ -92,16 +100,20 @@ def variants(addr):
             seen.add(v); uniq.append(v)
     return uniq
 
-def geocode(addr):
-    """地址 → (lat,lng)。逐級退化去試；全部唔得回 None，唔會估。"""
-    if addr in cache:
-        return cache[addr]
+def geocode(addr, viewbox=None):
+    """地址 → (lat,lng)。逐級退化去試；全部唔得回 None，唔會估。
+
+    viewbox 淨係第二回合（重試失敗個案）先會傳，所以 cache key 要分開，
+    否則第一回合嗰個錯答案會蓋住重試結果。"""
+    ck = addr if not viewbox else addr + '#box'
+    if ck in cache:
+        return cache[ck]
     res = None
     for v in variants(addr):
-        res = _one(v if v.endswith('香港') else f'{v}, 香港')
+        res = _one(v if v.endswith('香港') else f'{v}, 香港', viewbox)
         if res:
             break
-    cache[addr] = res
+    cache[ck] = res
     json.dump(cache, open(CACHE, 'w', encoding='utf-8'), ensure_ascii=False)
     return res
 
@@ -239,6 +251,74 @@ def main():
         if i % 20 == 0:
             print(f'  …{i}/{len(rows)}', file=sys.stderr)
 
+    # ---- 第二回合：用「同區已收貨嘅店」圍成個框，重試失敗個案 ----
+    # Nominatim 對香港細區嘅自由文字查詢好易亂答（花園街 → 坑口村）。
+    # 但我哋手上已經有幾百間核實過嘅店，同區嘅座標本身就係最好嘅範圍提示。
+    # 用同區已收貨嘅 bbox 加 1.5km 邊，再開 bounded=1 重試 —— 搵唔到好過搵錯。
+    from collections import defaultdict as _dd0
+    area_pts = _dd0(list)
+    for p in out:
+        a = next((x for x in AREAS if x in p['d']), None)
+        if a:
+            area_pts[a].append((p['a'], p['o']))
+
+    PAD = 0.015                            # 約 1.5km
+    def area_box(a):
+        pts = area_pts.get(a) or []
+        if len(pts) < 2:
+            return None                    # 冇參照就唔重試，唔好靠估
+        lats = [q[0] for q in pts]; lngs = [q[1] for q in pts]
+        return (min(lngs) - PAD, min(lats) - PAD, max(lngs) + PAD, max(lats) + PAD)
+
+    # 第三回合嘅後備：用本地 OSM 快照嘅街名質心。
+    # Nominatim 有啲香港街根本冇索引（實測「太子花園街」點問都答坑口村），
+    # 但快照入面有 8 間店嘅地址寫住花園街 —— 佢哋嘅質心就係最實在嘅街位。
+    OSM_SNAPSHOT = '/Users/winstonli/Documents/fitfood-map/data/hk-places.json'
+    _street_pts = None
+    def street_centroid(addr, box):
+        nonlocal _street_pts
+        if _street_pts is None:
+            _street_pts = _dd0(list)
+            try:
+                for q in json.load(open(OSM_SNAPSHOT, encoding='utf-8'))['places']:
+                    for m in re.finditer(r'([\u4e00-\u9fff]{2,8}?(?:街|道|路|里|巷|徑|坊))', q.get('d') or ''):
+                        _street_pts[m.group(1)].append((q['a'], q['o']))
+            except Exception as e:
+                print(f'（讀唔到 OSM 快照，跳過街名質心：{e}）', file=sys.stderr)
+        for st in street_candidates(addr):
+            # 一定要限喺同區個框入面 —— 香港同名街唔少（花園街旺角同大埔都有）
+            pts = [q for q in _street_pts.get(st, [])
+                   if box[0] <= q[1] <= box[2] and box[1] <= q[0] <= box[3]]
+            if len(pts) >= 2:
+                return [round(sum(q[0] for q in pts) / len(pts), 6),
+                        round(sum(q[1] for q in pts) / len(pts), 6)]
+        return None
+
+    retry = [r for r in rows if r['name'] in set(nogeo) | {m[0] for m in mismatch}]
+    saved = []
+    for r in retry:
+        a = next((x for x in AREAS if x in r['addr']), None)
+        box = area_box(a) if a else None
+        if not box:
+            continue
+        pos = geocode(r['addr'], viewbox=box) or street_centroid(r['addr'], box)
+        if not pos:
+            continue
+        ok, rev = coord_matches_address(pos[0], pos[1], r['addr'])
+        if not ok:
+            continue
+        out.append({
+            'n': r['name'], 'a': pos[0], 'o': pos[1], 'd': r['addr'],
+            'r': r['district'],
+            'm': MEAT_MAP.get(r['cat'], 'other'), 's': 'best',
+            'why': r['why'], 'src': r['src'],
+        })
+        saved.append(r['name'])
+    if saved:
+        nogeo = [n for n in nogeo if n not in saved]
+        mismatch = [m for m in mismatch if m[0] not in saved]
+        print(f'  第二回合（限同區範圍）救返 {len(saved)} 間', file=sys.stderr)
+
     # 第三重：離群點檢查。
     # 街名對到都可以錯得好遠 —— 「大埔汀角路17號」同「汀角路大美督」街名一樣，
     # 但相距 7km。長街道嘅街道級回退會落喺錯嘅一端，反查對街名捉唔到。
@@ -266,6 +346,8 @@ def main():
 
     from collections import Counter
     print(f'\n出檔 {len(out)} 間，{os.path.getsize(DEST)/1024:.0f} KB')
+    if saved:
+        print(f'（其中 {len(saved)} 間靠第二回合限範圍重試救返：{"、".join(saved[:8])}{"…" if len(saved) > 8 else ""}）')
     print('分區：', dict(Counter(p["r"] for p in out)))
     print('分類：', dict(Counter(p["m"] for p in out)))
     if nogeo:
